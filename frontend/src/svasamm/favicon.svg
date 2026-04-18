@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Svasamm CRM">
+  <defs>
+    <linearGradient id="crm-fav" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#2563eb"/>
+      <stop offset="100%" stop-color="#1e40af"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="12" fill="url(#crm-fav)"/>
+  <!-- Three stacked trapezoids in white — same motif as logo, scaled for 64×64 -->
+  <g fill="#ffffff">
+    <path d="M12 16 L52 16 L46 26 L18 26 Z"/>
+    <path d="M20 28 L44 28 L38 40 L26 40 Z"/>
+    <path d="M28 42 L36 42 L34 52 L30 52 Z"/>
+  </g>
+</svg>

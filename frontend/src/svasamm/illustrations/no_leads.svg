@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="400" height="300" role="img" aria-label="No leads yet">
+  <defs>
+    <linearGradient id="nl-g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#2563eb"/>
+      <stop offset="100%" stop-color="#1e40af"/>
+    </linearGradient>
+  </defs>
+  <!-- Soft background accent circle -->
+  <circle cx="200" cy="150" r="110" fill="#dbeafe" opacity="0.6"/>
+  <!-- Central funnel outline -->
+  <g fill="none" stroke="url(#nl-g)" stroke-width="3" stroke-linejoin="round">
+    <path d="M130 90 L270 90 L230 150 L230 220 L170 220 L170 150 Z"/>
+  </g>
+  <!-- Empty dots above funnel (leads that could flow in) -->
+  <g fill="#2563eb" opacity="0.4">
+    <circle cx="155" cy="70" r="5"/>
+    <circle cx="185" cy="62" r="5"/>
+    <circle cx="215" cy="62" r="5"/>
+    <circle cx="245" cy="70" r="5"/>
+  </g>
+  <!-- Dashed arrow pointing in -->
+  <path d="M200 38 L200 78" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-dasharray="4 4"/>
+  <path d="M194 72 L200 80 L206 72" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
