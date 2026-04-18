@@ -18,11 +18,13 @@ export default defineConfig(async ({ mode }) => {
         },
         manifest: {
           display: 'standalone',
-          name: 'Frappe CRM',
-          short_name: 'Frappe CRM',
+          name: 'Svasamm CRM',
+          short_name: 'Svasamm CRM',
           start_url: '/crm',
           description:
-            'Modern & 100% Open-source CRM tool to supercharge your sales operations',
+            'Svasamm CRM — the customer relationship management product by Svasamm Research',
+          theme_color: '#2563eb',
+          background_color: '#ffffff',
           icons: [
             {
               src: '/assets/crm/manifest/manifest-icon-192.maskable.png',
@@ -85,7 +87,7 @@ export default defineConfig(async ({ mode }) => {
         emptyOutDir: true,
         sourcemap: true,
       },
-    }),
+    })
   )
 
   return config
@@ -109,7 +111,7 @@ async function importFrappeUIPlugin(isDev, config) {
     } catch (error) {
       console.warn(
         'Local frappe-ui not found, falling back to npm package:',
-        error.message,
+        error.message
       )
     }
   }
@@ -123,11 +125,11 @@ function getAliases(config) {
     ...config.resolve.alias,
     'frappe-ui/tailwind': path.resolve(
       __dirname,
-      '../frappe-ui/tailwind/preset.js',
+      '../frappe-ui/tailwind/preset.js'
     ),
     'frappe-ui/style.css': path.resolve(
       __dirname,
-      '../frappe-ui/src/style.css',
+      '../frappe-ui/src/style.css'
     ),
     'frappe-ui/frappe': path.resolve(__dirname, '../frappe-ui/frappe/index.js'),
     'frappe-ui': path.resolve(__dirname, '../frappe-ui/src/index.ts'),
