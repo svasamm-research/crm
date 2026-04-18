@@ -5,7 +5,11 @@
       :class="widthClass"
       :style="{ top: top }"
     >
-      <Icon :icon="icon" class="size-7.5 text-ink-gray-5" />
+      <img
+        :src="illustration"
+        :alt="`No ${props.name || 'records'} yet`"
+        class="empty-state-illustration size-7.5"
+      />
       <div class="flex flex-col items-center gap-1">
         <span class="text-lg font-medium text-ink-gray-8">
           {{ computedTitle }}
@@ -20,6 +24,9 @@
 <script setup>
 import Icon from '@/components/Icon.vue'
 import { computed } from 'vue'
+import noLeads from '@/svasamm/illustrations/no_leads.svg'
+import noDeals from '@/svasamm/illustrations/no_deals.svg'
+import noTasks from '@/svasamm/illustrations/no_tasks.svg'
 
 const props = defineProps({
   name: { type: String, required: true },
@@ -38,13 +45,18 @@ const computedTitle = computed(() => {
 })
 
 const computedDescription = computed(() => {
-  return props.description
-    ? props.description
-    : __(
-        'It appears that there are currently no {0} available. You can create more {0} by using the Create button.',
-        [__(props.name)],
-      )
+  if (props.description) return props.description
+  return __('Nothing here yet. Create your first {0} to get started.', [
+    __(props.name),
+  ])
 })
+
+const illustrationByName = {
+  Leads: noLeads,
+  Deals: noDeals,
+  Tasks: noTasks,
+}
+const illustration = computed(() => illustrationByName[props.name] || noLeads)
 
 const widthClass = computed(() => {
   switch (props.width) {
