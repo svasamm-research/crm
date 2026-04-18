@@ -6,10 +6,12 @@
       <slot />
     </div>
     <GlobalModals />
+    <AppFooter />
   </div>
 </template>
 <script setup>
 import MobileSidebar from '@/components/Mobile/MobileSidebar.vue'
 import MobileAppHeader from '@/components/Mobile/MobileAppHeader.vue'
 import GlobalModals from '@/components/Modals/GlobalModals.vue'
+import AppFooter from '@/svasamm/AppFooter.vue'
 </script>
