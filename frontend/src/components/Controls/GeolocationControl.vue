@@ -126,7 +126,7 @@ const sizeClasses = computed(
       md: 'h-8 text-base rounded',
       lg: 'h-10 text-lg rounded-md',
       xl: 'h-10 text-xl rounded-md',
-    }[attrs.size || 'sm'])
+    })[attrs.size || 'sm'],
 )
 
 const paddingClasses = computed(
@@ -136,7 +136,7 @@ const paddingClasses = computed(
       md: 'px-2.5',
       lg: 'px-3',
       xl: 'px-3',
-    }[attrs.size || 'sm'])
+    })[attrs.size || 'sm'],
 )
 
 const variantClasses = computed(() => {
@@ -164,7 +164,7 @@ const iconClasses = computed(
       md: 'h-3.5 w-3.5 shrink-0',
       lg: 'h-4 w-4 shrink-0',
       xl: 'h-4 w-4 shrink-0',
-    }[attrs.size || 'sm'])
+    })[attrs.size || 'sm'],
 )
 
 const containerClasses = computed(() =>
@@ -176,7 +176,7 @@ const containerClasses = computed(() =>
     attrs.class,
   ]
     .filter(Boolean)
-    .join(' ')
+    .join(' '),
 )
 
 // ─── Map lifecycle ──────────────────────────────────────────────────────────
@@ -245,25 +245,25 @@ async function initMap() {
       maxZoom: 19,
       attribution:
         '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-    }
+    },
   )
   const satelliteLayer = L.tileLayer(
     'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-    { attribution: '© Esri © OpenStreetMap Contributors' }
+    { attribution: '© Esri © OpenStreetMap Contributors' },
   )
   const labelsLayer = L.tileLayer(
     'https://tiles.stadiamaps.com/tiles/stamen_toner_labels/{z}/{x}/{y}{r}.png',
     {
       attribution:
         '© <a href="https://www.stadiamaps.com/">Stadia Maps</a> © <a href="https://www.stamen.com/">Stamen Design</a>',
-    }
+    },
   )
   const terrainLayer = L.tileLayer(
     'https://tiles.stadiamaps.com/tiles/stamen_terrain_lines/{z}/{x}/{y}{r}.png',
     {
       attribution:
         '© <a href="https://www.stadiamaps.com/">Stadia Maps</a> © <a href="https://www.stamen.com/">Stamen Design</a>',
-    }
+    },
   )
 
   streetLayer.addTo(mapInstance)
@@ -271,7 +271,7 @@ async function initMap() {
   L.control
     .layers(
       { Default: streetLayer, Satellite: satelliteLayer },
-      { Labels: labelsLayer, Terrain: terrainLayer }
+      { Labels: labelsLayer, Terrain: terrainLayer },
     )
     .addTo(mapInstance)
 
@@ -356,7 +356,7 @@ function reloadData() {
           }
           return L.marker(latlng)
         },
-      })
+      }),
     )
     addNonGroupLayers(dataGroup, editableLayers)
     fitMap()
