@@ -50,7 +50,7 @@ app.use(translationPlugin)
 for (let key in globalComponents) {
   app.component(key, globalComponents[key])
 }
-app.use(telemetryPlugin, { app_name: 'crm' })
+app.use(telemetryPlugin, { app_name: 'svasamm-crm' })
 
 app.config.globalProperties.$dialog = createDialog
 
@@ -64,7 +64,7 @@ if (import.meta.env.DEV) {
       socket = initSocket()
       app.config.globalProperties.$socket = socket
       app.mount('#app')
-    },
+    }
   )
 } else {
   socket = initSocket()
