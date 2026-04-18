@@ -144,6 +144,14 @@ jobs:
             FLUSH PRIVILEGES;
           "
 
+      - name: Map test.localhost in /etc/hosts (for Playwright browser)
+        run: |
+          # Frappe routes by Host header, but the headless browser running
+          # Playwright resolves hostnames via DNS/hosts first. GitHub runners
+          # don't map test.localhost by default, so page.goto fails with
+          # 'Cannot navigate to invalid URL'.
+          echo "127.0.0.1 test.localhost" | sudo tee -a /etc/hosts
+
       - name: Create test site with CRM
         working-directory: frappe-bench
         run: |

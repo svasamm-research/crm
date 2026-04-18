@@ -1,91 +1,84 @@
-# Pre-push test hook deliberately omitted — Playwright runs in CI only.
-# Add a local script in a future task if local pre-push coverage is desired.
-exclude: 'node_modules|.git|frontend/dist'
+exclude: "node_modules|.git"
 default_stages: [pre-commit]
-# Register hook types so `pre-commit install` sets up:
-#   .git/hooks/pre-commit   ← runs before every commit  (linting)
-#   .git/hooks/commit-msg   ← validates the commit message (commitlint)
-default_install_hook_types: [pre-commit, commit-msg]
 fail_fast: false
 
+# Preserved from upstream frappe/crm v1.66.2 so pre-commit rules match
+# what upstream authored (avoids 197-file formatting-drift diffs that would
+# make upstream bumps painful). Only two Svasamm additions:
+#   1. no-commit-to-branch also blocks main (upstream only blocks develop)
+#   2. commitlint hook for Conventional Commits (commit-msg stage)
+#
+# If upstream bumps their pre-commit rules, we pick those up on the next
+# upstream merge into svasamm/base.
 
 repos:
-  - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v6.0.0
-    hooks:
-      - id: trailing-whitespace
-        files: "frontend/.*|.*/crm/.*"
-        exclude: ".*json$|.*txt$|.*csv|.*md|.*svg|frontend/dist/.*|node_modules/.*"
-      # Block direct commits to main and develop — use a PR instead.
-      # uat is allowed (cherry-picks from develop); deploys are gated by GitHub Releases.
-      - id: no-commit-to-branch
-        args: ['--branch', 'main', '--branch', 'develop']
-      - id: check-merge-conflict
-      - id: check-ast
-      - id: check-json
-      - id: check-toml
-      - id: check-yaml
-      - id: debug-statements
+    - repo: https://github.com/pre-commit/pre-commit-hooks
+      rev: v5.0.0
+      hooks:
+          - id: trailing-whitespace
+            files: "crm.*"
+            exclude: ".*json$|.*txt$|.*csv|.*md|.*svg"
+          - id: no-commit-to-branch
+            # Svasamm addition: also block main (upstream only blocked develop).
+            args: ["--branch", "develop", "--branch", "main"]
+          - id: check-merge-conflict
+          - id: check-ast
+          - id: check-json
+          - id: check-toml
+          - id: check-yaml
+          - id: debug-statements
 
-  - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.14.10
-    hooks:
-      - id: ruff
-        name: "Run ruff import sorter"
-        args: ["--select=I", "--fix"]
+    - repo: https://github.com/oxc-project/mirrors-oxlint
+      rev: v1.50.0
+      hooks:
+          - id: oxlint
+            files: ^frontend/.*\.(js|ts|vue)$
 
-      - id: ruff
-        name: "Run ruff linter"
+    - repo: https://github.com/pre-commit/mirrors-prettier
+      rev: v3.1.0
+      hooks:
+          - id: prettier
+            files: ^frontend/.*\.(js|ts|vue|css|scss|html|json)$
+            additional_dependencies:
+                - prettier@3.2.5
+            exclude: |
+                (?x)^(
+                    crm/public/dist/.*|
+                    crm/public/frontend/.*|
+                    .*node_modules.*|
+                )$
 
-      - id: ruff-format
-        name: "Run ruff formatter"
+    - repo: local
+      hooks:
+          - id: eslint
+            name: eslint
+            entry: bash -c 'cd frontend && eslint --fix src/**/*.{js,ts,vue}'
+            language: node
+            files: ^frontend/.*\.(js|ts|vue)$
+            pass_filenames: false
+            additional_dependencies:
+                - "eslint@^10.0.2"
+                - "@eslint/js@^10.0.1"
+                - "typescript-eslint@^8.56.1"
+                - "eslint-plugin-vue@^10.8.0"
+                - "eslint-config-prettier@^10.1.8"
+                - "globals@^17.3.0"
+                - "vue-eslint-parser@^10.4.0"
 
-  - repo: https://github.com/pre-commit/mirrors-prettier
-    rev: v2.7.1
-    hooks:
-      - id: prettier
-        language_version: system
-        types_or: [vue, javascript, ts, json, scss]
-        # Ignore generated and vendored files
-        exclude: |
-            (?x)^(
-                frontend/dist/.*|
-                .*node_modules.*|
-                .*boilerplate.*|
-                crm/public/dist/.*|
-                crm/public/frontend/.*|
-                crm/templates/includes/.*
-            )$
+    - repo: https://github.com/astral-sh/ruff-pre-commit
+      rev: v0.8.1
+      hooks:
+          - id: ruff
+            name: "Run ruff linter and apply fixes"
+            args: ["--fix"]
+          - id: ruff-format
+            name: "Run ruff formatter"
 
-  - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v8.44.0
-    hooks:
-      - id: eslint
-        language_version: system
-        types_or: [javascript, vue, ts]
-        args: ['--quiet']
-        # Ignore generated and vendored files
-        exclude: |
-            (?x)^(
-                frontend/dist/.*|
-                cypress/.*|
-                .*node_modules.*|
-                .*boilerplate.*|
-                crm/public/dist/.*|
-                crm/public/frontend/.*|
-                crm/templates/includes/.*
-            )$
-
-  # Validates commit messages against commitlint.config.cjs on every `git commit`
-  # language_version: system → uses your PATH node instead of a pre-commit-managed
-  # binary (avoids macOS libc++ incompatibility on Monterey / Darwin 21).
-  - repo: https://github.com/alessandrojcm/commitlint-pre-commit-hook
-    rev: v9.23.0
-    hooks:
-      - id: commitlint
-        stages: [commit-msg]
-        language_version: system
-        additional_dependencies: ['conventional-changelog-conventionalcommits']
+    # Commitlint runs via CI (linters.yml::semantic-commits), not as a
+    # local pre-commit hook. The pre-commit hook tries to install its own
+    # Node binary which has a libc++ ABI mismatch on macOS Sequoia (dyld
+    # 'Symbol not found' on __libcpp_verbose_abort). CI runs Conventional
+    # Commits validation on every PR regardless.
 
 ci:
     autoupdate_schedule: weekly

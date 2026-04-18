@@ -65,19 +65,7 @@ jobs:
                   artifact-name: coverage-${{ matrix.container }}
                   coverage-path: /home/runner/frappe-bench/sites/coverage.xml
 
-    coverage:
-        name: Coverage Wrap Up
-        needs: test
-        if: github.base_ref == 'develop' || github.ref_name == 'develop'
-        runs-on: ubuntu-latest
-        steps:
-            - name: Clone
-              uses: actions/checkout@v6
-
-            - name: Download artifacts
-              uses: actions/download-artifact@v4
-
-            - name: Publish coverage
-              uses: ./.github/actions/publish-codecov
-              with:
-                  token: ${{ secrets.CODECOV_TOKEN }}
+    # Coverage Wrap Up job removed in the Svasamm fork — upstream frappe/crm
+    # publishes to their Codecov account, which we do not have a CODECOV_TOKEN
+    # for. Tests still run and publish artifacts above. If Svasamm adopts
+    # Codecov later, restore this block and set the token at org level.
