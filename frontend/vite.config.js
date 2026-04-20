@@ -87,7 +87,7 @@ export default defineConfig(async ({ mode }) => {
         emptyOutDir: true,
         sourcemap: true,
       },
-    })
+    }),
   )
 
   return config
@@ -111,7 +111,7 @@ async function importFrappeUIPlugin(isDev, config) {
     } catch (error) {
       console.warn(
         'Local frappe-ui not found, falling back to npm package:',
-        error.message
+        error.message,
       )
     }
   }
@@ -125,11 +125,11 @@ function getAliases(config) {
     ...config.resolve.alias,
     'frappe-ui/tailwind': path.resolve(
       __dirname,
-      '../frappe-ui/tailwind/preset.js'
+      '../frappe-ui/tailwind/preset.js',
     ),
     'frappe-ui/style.css': path.resolve(
       __dirname,
-      '../frappe-ui/src/style.css'
+      '../frappe-ui/src/style.css',
     ),
     'frappe-ui/frappe': path.resolve(__dirname, '../frappe-ui/frappe/index.js'),
     'frappe-ui': path.resolve(__dirname, '../frappe-ui/src/index.ts'),

@@ -27,7 +27,7 @@ test.describe('Svasamm CRM SPA branding', () => {
     await expect(link).toHaveText(/source available/)
     await expect(link).toHaveAttribute(
       'href',
-      /github\.com\/svasamm-research\/crm/
+      /github\.com\/svasamm-research\/crm/,
     )
   })
 

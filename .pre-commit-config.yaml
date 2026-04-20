@@ -1,6 +1,23 @@
 exclude: "node_modules|.git"
-default_stages: [pre-commit]
+# Svasamm: hooks run at BOTH pre-commit and pre-push. Running them again
+# at push guarantees that a `git commit --no-verify` (local bypass) or a
+# stale index can't land bad code on the remote. See svasamm-research/dms
+# for the same pattern plus a pre-push-only tests+coverage hook.
+default_stages: [pre-commit, pre-push]
+# Register hook types so `pre-commit install` sets up:
+#   .git/hooks/pre-commit   ← linting before every commit
+#   .git/hooks/commit-msg   ← (CI-only commitlint — see note at bottom)
+#   .git/hooks/pre-push     ← re-runs pre-commit hooks before push
+default_install_hook_types: [pre-commit, commit-msg, pre-push]
 fail_fast: false
+
+# Svasamm: use the user's system Node for every language:node hook rather
+# than letting pre-commit download its own. On macOS Sequoia some
+# pre-commit-bundled Node binaries hit a libc++ ABI mismatch
+# (dyld: "Symbol not found: __libcpp_verbose_abort"). setup-node on CI
+# and nvm-managed Node locally are both reliably compatible.
+default_language_version:
+  node: system
 
 # Preserved from upstream frappe/crm v1.66.2 so pre-commit rules match
 # what upstream authored (avoids 197-file formatting-drift diffs that would
@@ -19,8 +36,18 @@ repos:
             files: "crm.*"
             exclude: ".*json$|.*txt$|.*csv|.*md|.*svg"
           - id: no-commit-to-branch
-            # Svasamm addition: also block main (upstream only blocked develop).
-            args: ["--branch", "develop", "--branch", "main"]
+            # Svasamm addition: block our integration branch (svasamm/develop)
+            # and main. `develop` is retained during the rename transition in
+            # case anyone has an old local `develop` branch; once upstream's
+            # develop is no longer present in any local clone, this entry
+            # should be dropped.
+            args:
+                - "--branch"
+                - "svasamm/develop"
+                - "--branch"
+                - "main"
+                - "--branch"
+                - "develop"
           - id: check-merge-conflict
           - id: check-ast
           - id: check-json
@@ -28,11 +55,21 @@ repos:
           - id: check-yaml
           - id: debug-statements
 
-    - repo: https://github.com/oxc-project/mirrors-oxlint
-      rev: v1.50.0
-      hooks:
-          - id: oxlint
-            files: ^frontend/.*\.(js|ts|vue)$
+    # Svasamm: oxlint disabled locally. The pre-commit node-env install
+    # runs `npm install --include=dev --include=prod` (pre-commit's
+    # default) which implicitly EXCLUDES optionalDependencies. oxlint
+    # ships its native bindings (@oxlint/binding-<platform>-<arch>) as
+    # optional deps, so on every fresh install the required binding is
+    # missing and the hook crashes with MODULE_NOT_FOUND at
+    # bindings.js:383 before linting any file.
+    #
+    # Coverage is fully redundant with eslint (same files, same rule
+    # families), so removing oxlint from pre-commit costs us nothing.
+    # Keep oxlint in any CI job that installs it via plain `npm i`
+    # (where optional deps resolve correctly) if upstream insists on it.
+    # TODO(sprint5): re-enable once
+    # https://github.com/pre-commit/pre-commit/issues/2882 lands or we
+    # migrate to a pure-JS fallback build.
 
     - repo: https://github.com/pre-commit/mirrors-prettier
       rev: v3.1.0

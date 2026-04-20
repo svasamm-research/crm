@@ -22,7 +22,7 @@
         {{ headingTitle }}
       </div>
       <div class="flex gap-1">
-        <Button @click="minimize = !minimize" variant="ghost">
+        <Button variant="ghost" @click="minimize = !minimize">
           <!-- FeatherIcon substitutes for frappe-ui's internal Minimize/Maximize
                icons (which aren't in the barrel export). 'chevrons-down' when
                expanded = click to minimize; 'chevrons-up' when minimized = click

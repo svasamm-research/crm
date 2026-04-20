@@ -30,7 +30,11 @@ name: E2E (Playwright)
 on:
   pull_request:
   push:
-    branches: [main, develop, uat]
+    # Svasamm: our fork's integration branch is `svasamm/develop` (not
+    # `develop`). The unqualified name would collide with upstream
+    # frappe/crm's `develop`; the `svasamm/` prefix makes ownership
+    # explicit in tooling, hooks, and CI logs.
+    branches: [main, svasamm/develop, uat]
   workflow_dispatch:
 
 concurrency:
@@ -190,7 +194,14 @@ jobs:
           curl -sf -o /dev/null http://test.localhost:8000/api/method/ping
 
       - name: Run Playwright tests (baseline capture if snapshots missing)
-        working-directory: frappe-bench/apps/crm
+        # IMPORTANT: Playwright looks for playwright.config.ts in the CURRENT
+        # working directory. The config (with baseURL + testDir) lives in
+        # frontend/playwright.config.ts, so the step must cd into frontend/
+        # before running playwright — not just --prefix it (which only
+        # affects module resolution, not cwd). Without this, baseURL is
+        # undefined and page.goto('/login') fails with
+        # "Protocol error (Page.navigate): Cannot navigate to invalid URL".
+        working-directory: frappe-bench/apps/crm/frontend
         env:
           BENCH_URL: http://test.localhost:8000
           TEST_USER: Administrator
@@ -200,11 +211,11 @@ jobs:
           # are still diff-checked. On first run this captures initial
           # baselines. On subsequent runs it's effectively a no-op for
           # existing baselines, update-check for drift.
-          if [ ! -d frontend/e2e/snapshots ]; then
+          if [ ! -d e2e/snapshots ]; then
             echo "No baselines yet — capturing first-time snapshots"
-            npx --prefix frontend playwright test --update-snapshots
+            npx playwright test --update-snapshots
           else
-            npx --prefix frontend playwright test
+            npx playwright test
           fi
 
       - name: Upload Playwright report on failure
