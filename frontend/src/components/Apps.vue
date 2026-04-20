@@ -63,7 +63,12 @@ const apps = createResource({
       },
     ]
     data.map((app) => {
+      // Filter self (no point linking back to current SPA) and ERPNext
+      // (svasamm: ERPNext is an infrastructure dependency, not a product
+      // users navigate to from CRM — keeping the menu focused on Svasamm-
+      // branded apps + the Desk fallback).
       if (app.name === 'crm') return
+      if (app.name === 'erpnext') return
       _apps.push({
         name: app.name,
         logo: app.logo,

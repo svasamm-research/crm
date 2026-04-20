@@ -1,11 +1,16 @@
 app_name = "crm"
-app_title = "Frappe CRM"
+app_title = "Svasamm CRM"
 app_publisher = "Frappe Technologies Pvt. Ltd."
 app_description = "Kick-ass Open Source CRM"
 app_email = "shariq@frappe.io"
 app_license = "AGPLv3"
-app_icon_url = "/assets/crm/images/logo.svg"
-app_icon_title = "CRM"
+# Svasamm branding: point the CRM app icon at our blue funnel under
+# crm/public/images/svasamm/ so the Apps-menu popover inside Helpdesk/DMS
+# SPAs and the /app launchpad tile render the Svasamm mark (not upstream's
+# pink funnel at crm/public/images/logo.svg, which stays pristine for
+# clean upstream diffs).
+app_icon_url = "/assets/crm/images/svasamm/logo.svg"
+app_icon_title = "Svasamm CRM"
 app_icon_route = "/crm"
 
 # Apps
@@ -15,8 +20,8 @@ app_icon_route = "/crm"
 add_to_apps_screen = [
 	{
 		"name": "crm",
-		"logo": "/assets/crm/images/logo.svg",
-		"title": "CRM",
+		"logo": "/assets/crm/images/svasamm/logo.svg",
+		"title": "Svasamm CRM",
 		"route": "/crm",
 		"has_permission": "crm.api.check_app_permission",
 	}
