@@ -8,12 +8,12 @@
       <slot />
     </div>
     <GlobalModals />
-    <AppFooter />
+    <!-- AppFooter removed from the persistent layout. AGPL source-offer
+         now lives only inside the About modal (AboutModal.vue). -->
   </div>
 </template>
 <script setup>
 import AppSidebar from '@/components/Layouts/AppSidebar.vue'
 import AppHeader from '@/components/Layouts/AppHeader.vue'
 import GlobalModals from '@/components/Modals/GlobalModals.vue'
-import AppFooter from '@/svasamm/AppFooter.vue'
 </script>

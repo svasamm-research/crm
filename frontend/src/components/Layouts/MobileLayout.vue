@@ -6,12 +6,12 @@
       <slot />
     </div>
     <GlobalModals />
-    <AppFooter />
+    <!-- AppFooter removed from the persistent layout. AGPL source-offer
+         now lives only inside the About modal (AboutModal.vue). -->
   </div>
 </template>
 <script setup>
 import MobileSidebar from '@/components/Mobile/MobileSidebar.vue'
 import MobileAppHeader from '@/components/Mobile/MobileAppHeader.vue'
 import GlobalModals from '@/components/Modals/GlobalModals.vue'
-import AppFooter from '@/svasamm/AppFooter.vue'
 </script>
