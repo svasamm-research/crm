@@ -5,10 +5,13 @@
       :class="widthClass"
       :style="{ top: top }"
     >
+      <!-- size-7.5 removed: our 400x300 illustrations need proportional rendering,
+           not icon-sized (30px). h-40 gives a reasonable ~160px height;
+           w-auto preserves aspect ratio; max-w-full respects parent widthClass. -->
       <img
         :src="illustration"
         :alt="`No ${props.name || 'records'} yet`"
-        class="empty-state-illustration size-7.5"
+        class="empty-state-illustration h-40 w-auto max-w-full"
       />
       <div class="flex flex-col items-center gap-1">
         <span class="text-lg font-medium text-ink-gray-8">
@@ -27,6 +30,10 @@ import { computed } from 'vue'
 import noLeads from '@/svasamm/illustrations/no_leads.svg'
 import noDeals from '@/svasamm/illustrations/no_deals.svg'
 import noTasks from '@/svasamm/illustrations/no_tasks.svg'
+import noContacts from '@/svasamm/illustrations/no_contacts.svg'
+import noOrganizations from '@/svasamm/illustrations/no_organizations.svg'
+import noNotes from '@/svasamm/illustrations/no_notes.svg'
+import noCallLogs from '@/svasamm/illustrations/no_call_logs.svg'
 
 const props = defineProps({
   name: { type: String, required: true },
@@ -51,10 +58,17 @@ const computedDescription = computed(() => {
   ])
 })
 
+// Map list-view name (passed by each page as the `name` prop) to its
+// Svasamm illustration. Fallback to noLeads only if a caller passes an
+// unrecognised name — every current upstream list view is covered below.
 const illustrationByName = {
   Leads: noLeads,
   Deals: noDeals,
   Tasks: noTasks,
+  Contacts: noContacts,
+  Organizations: noOrganizations,
+  Notes: noNotes,
+  'Call Logs': noCallLogs,
 }
 const illustration = computed(() => illustrationByName[props.name] || noLeads)
 
