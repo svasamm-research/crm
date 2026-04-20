@@ -35,6 +35,17 @@
           Built on Frappe CRM — © Frappe Technologies Pvt. Ltd. and
           contributors.
         </p>
+        <p class="text-sm text-ink-gray-6 px-2 mt-2">
+          <a
+            href="https://github.com/svasamm-research/crm/releases"
+            target="_blank"
+            rel="noopener"
+            class="underline text-ink-gray-7 hover:text-ink-gray-9"
+          >
+            {{ __('Source available') }}
+          </a>
+          — {{ __('AGPL §13 compliance (Svasamm fork)') }}
+        </p>
       </div>
     </template>
   </Dialog>

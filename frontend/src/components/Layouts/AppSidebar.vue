@@ -135,11 +135,12 @@
       v-model="showHelpModal"
       v-model:articles="articles"
       :logo="CRMLogo"
+      title="Svasamm CRM"
       :afterSkip="(step) => capture('onboarding_step_skipped_' + step)"
       :afterSkipAll="() => capture('onboarding_steps_skipped')"
       :afterReset="(step) => capture('onboarding_step_reset_' + step)"
       :afterResetAll="() => capture('onboarding_steps_reset')"
-      docsLink="https://docs.frappe.io/crm"
+      docsLink="https://github.com/svasamm-research/crm#readme"
     />
     <IntermediateStepModal
       v-model="showIntermediateModal"
@@ -188,7 +189,8 @@ import { FeatherIcon, call } from 'frappe-ui'
 import {
   SignupBanner,
   TrialBanner,
-  HelpModal,
+  // HelpModal replaced by Svasamm shadow below — omits upstream's
+  // "Help centre" footer link.
   GettingStartedBanner,
   useOnboarding,
   showHelpModal,
@@ -196,6 +198,7 @@ import {
   IntermediateStepModal,
   useTelemetry,
 } from 'frappe-ui/frappe'
+import HelpModal from '@/svasamm/HelpModal.vue'
 import router from '@/router'
 import { useStorage } from '@vueuse/core'
 import { useDemoData } from '@/composables/demoData'
