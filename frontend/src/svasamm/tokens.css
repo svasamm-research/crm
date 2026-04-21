@@ -1,0 +1,20 @@
+/* frontend/src/svasamm/tokens.css
+   Svasamm CRM brand tokens. Maps the Svasamm CRM palette onto the CSS
+   custom properties that frappe-ui's components consume.
+   Override point for all brand-color concerns in this fork. */
+
+:root {
+  /* Svasamm CRM palette */
+  --svasamm-primary: #2563eb;
+  --svasamm-primary-dark: #1e40af;
+  --svasamm-primary-tint: #dbeafe;
+
+  /* Map onto frappe-ui's primary-scale variables */
+  --p-500: #2563eb;
+  --p-600: #1e40af;
+  --p-100: #dbeafe;
+  --p-50: #eff6ff;
+
+  /* Focus ring */
+  --ring-color: rgba(37, 99, 235, 0.4);
+}

@@ -65,7 +65,12 @@ def check_app_permission():
 		allowed_modules = get_modules_from_all_apps_for_user()
 
 	allowed_modules = [x["module_name"] for x in allowed_modules]
-	if "FCRM" not in allowed_modules:
+	# Svasamm fork: full-suite DMS tenants access the SPA via the Svasamm CRM
+	# launcher tile (backed by the `Svasamm CRM` module). Their Module Profile
+	# hides the upstream FCRM Desktop Icon so the /app grid doesn't show a
+	# duplicate Frappe CRM tile, which means `get_modules_from_all_apps_for_user`
+	# doesn't return FCRM. Accept either module marker as proof of access.
+	if "FCRM" not in allowed_modules and "Svasamm CRM" not in allowed_modules:
 		return False
 
 	roles = frappe.get_roles()

@@ -5,14 +5,25 @@
     viewBox="0 0 300 300"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
+    role="img"
+    aria-label="Svasamm CRM"
   >
-    <path
-      d="M214.286 0H85.7143C38.3756 0 0 38.3756 0 85.7143V214.286C0 261.624 38.3756 300 85.7143 300H214.286C261.624 300 300 261.624 300 214.286V85.7143C300 38.3756 261.624 0 214.286 0Z"
-      fill="#EF0BF5"
-    />
-    <path
-      d="M64.2141 90.301V111.862H214.339V140.214L160.187 193.146V208.993L139.705 208.885V193.146L85.6605 140.214H64.2141V149.269L118.259 202.202V230.23L181.634 230.769V202.202L235.786 149.269V90.301H64.2141Z"
-      fill="white"
-    />
+    <!--
+      Svasamm CRM app-icon mark. ViewBox intentionally preserved at 300x300 so
+      existing callers (AppSidebar, BrandLogo, PreferencesSettings, AboutModal)
+      do not need layout adjustments.
+    -->
+    <defs>
+      <linearGradient id="crm-logo-grad" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#2563eb" />
+        <stop offset="100%" stop-color="#1e40af" />
+      </linearGradient>
+    </defs>
+    <rect width="300" height="300" rx="56" fill="url(#crm-logo-grad)" />
+    <g fill="#ffffff">
+      <path d="M56 75 L244 75 L216 122 L84 122 Z" />
+      <path d="M94 131 L206 131 L178 188 L122 188 Z" />
+      <path d="M131 197 L169 197 L159 244 L141 244 Z" />
+    </g>
   </svg>
 </template>

@@ -18,11 +18,13 @@ export default defineConfig(async ({ mode }) => {
         },
         manifest: {
           display: 'standalone',
-          name: 'Frappe CRM',
-          short_name: 'Frappe CRM',
+          name: 'Svasamm CRM',
+          short_name: 'Svasamm CRM',
           start_url: '/crm',
           description:
-            'Modern & 100% Open-source CRM tool to supercharge your sales operations',
+            'Svasamm CRM — the customer relationship management product by Svasamm Research',
+          theme_color: '#2563eb',
+          background_color: '#ffffff',
           icons: [
             {
               src: '/assets/crm/manifest/manifest-icon-192.maskable.png',

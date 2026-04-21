@@ -286,13 +286,20 @@ async function initMap() {
 
   // Draw controls — only in edit mode
   if (!props.disabled) {
+    // Resolve Svasamm brand primary (--p-500) at runtime — Leaflet shapeOptions
+    // expects a literal colour string, so we read the CSS custom property.
+    const brandPrimary =
+      getComputedStyle(document.documentElement)
+        .getPropertyValue('--p-500')
+        .trim() || '#2563eb'
+
     drawControl = new L.Control.Draw({
       position: 'topleft',
       draw: {
-        polyline: { shapeOptions: { color: '#4f46e5', weight: 4 } },
+        polyline: { shapeOptions: { color: brandPrimary, weight: 4 } },
         polygon: {
           allowIntersection: false,
-          shapeOptions: { color: '#4f46e5' },
+          shapeOptions: { color: brandPrimary },
         },
         circle: true,
         rectangle: { shapeOptions: { clickable: false } },

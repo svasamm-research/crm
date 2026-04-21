@@ -8,6 +8,8 @@
       <slot />
     </div>
     <GlobalModals />
+    <!-- AppFooter removed from the persistent layout. AGPL source-offer
+         now lives only inside the About modal (AboutModal.vue). -->
   </div>
 </template>
 <script setup>

@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="400" height="300" role="img" aria-label="No organizations yet">
+  <defs>
+    <linearGradient id="no-g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#2563eb"/>
+      <stop offset="100%" stop-color="#1e40af"/>
+    </linearGradient>
+  </defs>
+  <circle cx="200" cy="150" r="110" fill="#dbeafe" opacity="0.6"/>
+  <!-- Stylized multi-floor building: outer frame + rows of windows -->
+  <g stroke="url(#no-g)" stroke-width="3" stroke-linejoin="round" fill="#ffffff">
+    <rect x="140" y="80" width="120" height="150" rx="4"/>
+  </g>
+  <!-- Entrance door -->
+  <g fill="url(#no-g)">
+    <rect x="188" y="195" width="24" height="35" rx="2"/>
+  </g>
+  <!-- Windows: 3 rows × 4 columns, skip door column -->
+  <g fill="#2563eb" opacity="0.4">
+    <rect x="154" y="95" width="16" height="18" rx="1"/>
+    <rect x="178" y="95" width="16" height="18" rx="1"/>
+    <rect x="206" y="95" width="16" height="18" rx="1"/>
+    <rect x="230" y="95" width="16" height="18" rx="1"/>
+    <rect x="154" y="125" width="16" height="18" rx="1"/>
+    <rect x="178" y="125" width="16" height="18" rx="1"/>
+    <rect x="206" y="125" width="16" height="18" rx="1"/>
+    <rect x="230" y="125" width="16" height="18" rx="1"/>
+    <rect x="154" y="155" width="16" height="18" rx="1"/>
+    <rect x="178" y="155" width="16" height="18" rx="1"/>
+    <rect x="206" y="155" width="16" height="18" rx="1"/>
+    <rect x="230" y="155" width="16" height="18" rx="1"/>
+  </g>
+  <!-- Small flag on top -->
+  <g stroke="#2563eb" stroke-width="2.5" stroke-linecap="round" fill="none" opacity="0.8">
+    <line x1="200" y1="80" x2="200" y2="60"/>
+  </g>
+  <path d="M200 60 L218 64 L200 70 Z" fill="url(#no-g)"/>
+</svg>

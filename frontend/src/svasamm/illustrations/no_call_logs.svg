@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="400" height="300" role="img" aria-label="No call logs yet">
+  <defs>
+    <linearGradient id="ncl-g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#2563eb"/>
+      <stop offset="100%" stop-color="#1e40af"/>
+    </linearGradient>
+  </defs>
+  <circle cx="200" cy="150" r="110" fill="#dbeafe" opacity="0.6"/>
+  <!-- Classic phone-handset silhouette -->
+  <g fill="url(#ncl-g)">
+    <path d="M155 95 Q150 90 155 85 L180 85 Q195 85 198 100 L200 115 Q200 125 190 130 L185 132 Q198 168 220 185 L223 180 Q230 170 240 170 L255 172 Q270 175 270 190 L270 215 Q270 225 260 225 Q180 220 155 140 Z"/>
+  </g>
+  <!-- Sound wave bars emanating from handset -->
+  <g stroke="#2563eb" stroke-width="3" stroke-linecap="round" fill="none" opacity="0.4">
+    <path d="M280 130 Q295 140 280 155"/>
+    <path d="M290 115 Q315 140 290 170"/>
+    <path d="M300 100 Q335 140 300 185"/>
+  </g>
+  <!-- Dashed missed-call indicator -->
+  <g stroke="#2563eb" stroke-width="2" stroke-dasharray="4 3" stroke-linecap="round" opacity="0.5">
+    <circle cx="135" cy="95" r="15" fill="none"/>
+  </g>
+  <g stroke="#1e40af" stroke-width="2.5" stroke-linecap="round" fill="none">
+    <path d="M129 89 L141 101"/>
+    <path d="M141 89 L129 101"/>
+  </g>
+</svg>

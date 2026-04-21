@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="400" height="300" role="img" aria-label="No notes yet">
+  <defs>
+    <linearGradient id="nn-g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#2563eb"/>
+      <stop offset="100%" stop-color="#1e40af"/>
+    </linearGradient>
+  </defs>
+  <circle cx="200" cy="150" r="110" fill="#dbeafe" opacity="0.6"/>
+  <!-- Paper note with folded corner -->
+  <g fill="#ffffff" stroke="url(#nn-g)" stroke-width="3" stroke-linejoin="round">
+    <path d="M145 80 L240 80 L265 105 L265 230 L145 230 Z"/>
+  </g>
+  <!-- Folded-corner triangle -->
+  <path d="M240 80 L240 105 L265 105 Z" fill="#dbeafe" stroke="url(#nn-g)" stroke-width="3" stroke-linejoin="round"/>
+  <!-- Horizontal writing lines -->
+  <g stroke="#2563eb" stroke-width="3" stroke-linecap="round" opacity="0.4">
+    <line x1="160" y1="125" x2="245" y2="125"/>
+    <line x1="160" y1="145" x2="250" y2="145"/>
+    <line x1="160" y1="165" x2="230" y2="165"/>
+    <line x1="160" y1="185" x2="245" y2="185"/>
+    <line x1="160" y1="205" x2="215" y2="205"/>
+  </g>
+  <!-- Pencil tip at bottom-right hinting at "write a note" -->
+  <g fill="url(#nn-g)" opacity="0.7">
+    <path d="M280 215 L295 200 L305 210 L290 225 Z"/>
+    <path d="M278 217 L288 227 L285 230 L275 220 Z" fill="#1e40af"/>
+  </g>
+</svg>

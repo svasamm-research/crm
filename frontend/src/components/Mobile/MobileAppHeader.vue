@@ -9,6 +9,8 @@
         <MenuIcon class="h-4 text-ink-gray-9" />
       </Button>
     </div>
+    <!-- Svasamm brand block intentionally removed — sidebar + breadcrumb
+         carry product identity; the header should stay content-focused. -->
     <div id="app-header" class="flex-1" />
   </div>
   <CallUI class="mr-3 mt-2" />
