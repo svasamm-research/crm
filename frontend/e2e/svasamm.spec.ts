@@ -33,24 +33,26 @@ test.describe('Svasamm CRM SPA branding', () => {
     await expect(page).toHaveTitle(/Svasamm CRM/, { timeout: 10_000 })
   })
 
-  test('AGPL footer is present with source link', async ({ page }) => {
-    await page.goto('/crm')
-    const footer = page.locator('.svasamm-footer')
-    await expect(footer).toBeVisible({ timeout: 10_000 })
-    const link = footer.locator('a')
-    await expect(link).toHaveText(/source available/)
-    await expect(link).toHaveAttribute(
-      'href',
-      /github\.com\/svasamm-research\/crm/,
-    )
-  })
-
-  test('navbar shows Svasamm logo', async ({ page }) => {
-    await page.goto('/crm')
-    await page.waitForSelector('header, nav', { timeout: 10_000 })
-    const logo = page.locator('img[alt*="Svasamm CRM" i]').first()
-    await expect(logo).toBeVisible({ timeout: 10_000 })
-  })
+  // NOTE: Two tests previously lived here and have been removed because they
+  // validated surfaces owned by OTHER layers of the stack, not by this fork:
+  //
+  //   1. `.svasamm-footer` AGPL footer — injected by the `svasamm_crm`
+  //      tenant-layer wrapper app (Layer 2b) via `web_include_css` +
+  //      `extend_bootinfo`. The CI test site here only installs
+  //      `crm + erpnext + frappe` — no `svasamm_crm` — so the footer
+  //      never renders. Test belongs in `svasamm_crm`'s own e2e suite.
+  //
+  //   2. `img[alt*="Svasamm CRM"]` navbar logo — the AppHeader component
+  //      was stripped down in Sprint 4 Phase 1 (kept only teleport +
+  //      CallUI; see `frontend/src/components/Layouts/AppHeader.vue`).
+  //      There is no navbar <img> to assert on anymore.
+  //
+  // Fork-level AGPL source link verification lives in AboutModal.vue
+  // (`https://github.com/svasamm-research/crm/releases`). Wiring the
+  // UserMenu-click-to-open flow into this suite is tracked for Sprint 5
+  // once the tenant-layer e2e setup lands; until then the dashboard +
+  // leads snapshot tests below catch any visual regression on the
+  // fork-owned chrome.
 
   test('snapshot: crm dashboard after login', async ({ page }) => {
     await page.goto('/crm')
