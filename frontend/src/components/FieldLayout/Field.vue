@@ -321,7 +321,25 @@ const isGridRow = inject('isGridRow')
 const { getFormattedPercent, getFormattedFloat, getFormattedCurrency } =
   getMeta(doctype)
 
-const { users, getUser } = usersStore()
+const { users, getUser, canCreateMasters } = usersStore()
+
+// Sprint 10 (Svasamm fork patch) — doctypes whose pickers should NOT
+// auto-show "+ Create new" for non-admin users. Non-admin users must
+// pick from existing values; admin-tier users (see canCreateMasters in
+// stores/users.js) manage the master lists.
+//
+// Backend hooks in dms/has_permission.py (territory_permission,
+// industry_segment_permission, crm_industry_permission) reject the
+// actual create server-side. This client-side list just hides the
+// picker affordance so non-admin users don't see a button that would
+// 403 on submit. Stock CRM-only deployments without DMS still get the
+// gate because canCreateMasters() falls back to System Manager / Sales
+// Manager / Administrator there.
+const ADMIN_ONLY_CREATABLE_DOCTYPES = [
+  'Territory',
+  'CRM Industry',
+  'Industry Segment',
+]
 
 let triggerOnChange
 let triggerButton
@@ -372,7 +390,16 @@ const field = computed(() => {
   }
 
   if (field.fieldtype === 'Link' && field.options !== 'User') {
-    if (!field.create) {
+    // Sprint 10 (Svasamm fork patch) — gate the auto-assigned create
+    // callback on admin-only master doctypes. Backend has_permission
+    // hooks reject the create server-side regardless; this prevents the
+    // "+ Create new" affordance from rendering for non-admin users so
+    // they don't see a button that would 403 on submit.
+    const restrictedDoctype = ADMIN_ONLY_CREATABLE_DOCTYPES.includes(
+      field.options,
+    )
+    const allowCreate = !restrictedDoctype || canCreateMasters()
+    if (allowCreate && !field.create) {
       field.create = (value, close) => {
         const callback = (d) => {
           if (d) fieldChange(d.name, field)

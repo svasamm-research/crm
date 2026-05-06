@@ -57,6 +57,41 @@ export const usersStore = defineStore('crm-users', () => {
     return getUser(email).role === 'Sales Manager' || isAdmin(email)
   }
 
+  // Sprint 10 (Svasamm fork patch) — admin-tier role check.
+  //
+  // Used by Field.vue to gate the picker "+ Create new" option on
+  // master-list doctypes (Territory / CRM Industry / Industry Segment)
+  // where non-admin users should pick from existing values rather than
+  // create new ones.
+  //
+  // Reads the full `roles` array from crm.api.session.get_users — the
+  // primary `role` field only carries the top-of-ladder rank and misses
+  // sub-role inheritance (a profile that inherits Sales User as a base
+  // and adds an admin role on top would still return Sales User as
+  // .role). Falls back to the primary `role` if `roles` is missing.
+  //
+  // Role list intentionally permissive — extra entries beyond the stock
+  // Frappe CRM trio (System Manager / Administrator / Sales Manager)
+  // are safe no-ops on deployments where those roles don't exist as
+  // records. Client forks should extend this list when introducing new
+  // admin-tier roles.
+  function canCreateMasters(email) {
+    const u = getUser(email)
+    const adminRoles = [
+      // Stock Frappe CRM admin tier — present in every deployment.
+      'System Manager',
+      'Administrator',
+      'Sales Manager',
+      // Distributor-management add-on roles (DMS / videojet_override).
+      // Dead entries on stock CRM-only deployments — these role names
+      // don't exist as records there, so the .includes() never matches.
+      'OEM Admin',
+      'OEM Sales Admin',
+    ]
+    const roles = u.roles || (u.role ? [u.role] : [])
+    return roles.some((r) => adminRoles.includes(r))
+  }
+
   function isWebsiteUser(email) {
     return getUser(email).user_type === 'Website User'
   }
@@ -89,6 +124,7 @@ export const usersStore = defineStore('crm-users', () => {
     getUser,
     isAdmin,
     isManager,
+    canCreateMasters,
     isSalesUser,
     isTelephonyAgent,
     getUserRole,

@@ -12,12 +12,10 @@
       />
     </div>
     <div class="flex gap-1">
-      <Button
-        v-if="isManager() && !isMobileView"
-        :tooltip="__('Edit Fields Layout')"
-        :icon="EditIcon"
-        @click="showDataFieldsModal = true"
-      />
+      <!-- Sprint 10 (Svasamm fork patch #71) — Edit Fields Layout button
+           removed. Layouts are pre-seeded as code in
+           svasamm_crm/setup/form_layouts.py and locked down so they
+           cannot be edited inline per UAT requirement. -->
       <Button
         label="Save"
         :disabled="!document.isDirty"
