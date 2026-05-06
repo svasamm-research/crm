@@ -9,14 +9,10 @@
             </h3>
           </div>
           <div class="flex items-center gap-1">
-            <Button
-              v-if="isManager()"
-              :tooltip="__('Edit Fields Layout')"
-              variant="ghost"
-              class="w-7"
-              :icon="EditIcon"
-              @click="openGridRowFieldsModal"
-            />
+            <!-- Sprint 10 (Svasamm fork patch #71) — Edit Fields Layout
+                 button removed. Layouts are pre-seeded as code in
+                 svasamm_crm/setup/form_layouts.py and locked down so they
+                 cannot be edited inline per UAT requirement. -->
             <Button
               icon="x"
               variant="ghost"
