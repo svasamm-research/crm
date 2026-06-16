@@ -1,0 +1,28 @@
+<template>
+  <svg
+    width="16"
+    height="16"
+    viewBox="0 0 16 16"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      d="M8 1.5L13.5 4.5V11.5L8 14.5L2.5 11.5V4.5L8 1.5Z"
+      stroke="currentColor"
+      stroke-width="1"
+      stroke-linejoin="round"
+    />
+    <path
+      d="M2.5 4.5L8 7.5L13.5 4.5"
+      stroke="currentColor"
+      stroke-width="1"
+      stroke-linejoin="round"
+    />
+    <path
+      d="M8 7.5V14.5"
+      stroke="currentColor"
+      stroke-width="1"
+      stroke-linejoin="round"
+    />
+  </svg>
+</template>
