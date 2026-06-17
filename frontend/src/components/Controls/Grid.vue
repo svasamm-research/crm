@@ -142,7 +142,9 @@
                     "
                     :filters="field.filters"
                     :onCreate="
-                      (value, close) => field.create(v, field, row, close)
+                      disableLinkCreate
+                        ? undefined
+                        : (value, close) => field.create(v, field, row, close)
                     "
                     @change="(v) => fieldChange(v, field, row)"
                   />
@@ -466,6 +468,10 @@ const props = defineProps({
   parentDoctype: { type: String, required: true },
   parentFieldname: { type: String, required: true },
   overrides: { type: Object, default: () => ({}) },
+  // When true, hide the Link picker's inline "Create New" affordance — the
+  // linked master is managed elsewhere (e.g. CRM Product is synced from
+  // ERPNext Items), so rows must be picked, not hand-created.
+  disableLinkCreate: { type: Boolean, default: false },
 })
 
 const restrictedFieldTypes = [

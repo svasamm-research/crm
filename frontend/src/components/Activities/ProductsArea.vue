@@ -32,6 +32,7 @@
       doctype="CRM Products"
       :parentDoctype="doctype"
       parentFieldname="products"
+      :disableLinkCreate="true"
     />
   </div>
 </template>
