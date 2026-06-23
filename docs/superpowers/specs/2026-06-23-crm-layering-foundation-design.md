@@ -185,7 +185,35 @@ If the plugin approach hits a Rollup/`fs.allow` wall, fall back order: (1) tight
 - Base CRM features #1 (contacts filter), #2 (Kanban default), #3 (task/note selector), #4 (ref-follow), #6 (editable reference) — these go in `crm` fork + `svasamm_crm_defaults` and do **not** depend on this mechanism.
 - SES email + S3 backups (later workstreams).
 
-## 8. Open Questions / Spec-time validations
+## 8. Deployment & Plans
+
+### Where deployment lives
+
+`videojet_crm_override` is its **own git repo** (`svasamm-research/videojet_crm_override`) with `uat`/`develop` branches, exactly like every other app. **`frappe_docker` holds no app code** — only the per-tenant manifest (`apps/dms-uat.json`) and the build workflows. So deployment is handled by a **one-line manifest addition**:
+
+```
+apps/dms-uat.json:  ... + { "url": ".../videojet_crm_override", "branch": "uat" }
+```
+
+The pipeline is **unchanged**: release tag → `trigger-image-build` → `build-dms-uat` (the layered `Containerfile` runs `bench init --apps_path=/opt/frappe/apps.json`, which clones **all** manifest apps in one step) → push `dms-tenant:uat-vX.Y.Z` → Dokploy redeploy → `configurator` (`bench build --production` + copy each app's assets into the persistent volume + `bench migrate`).
+
+### Why the override's Vue ends up in the bundle
+
+Because all manifest apps are cloned together (`bench init`) and the SPA is (re)built with every app on disk, the Vite plugin sees `videojet_crm_override/frontend/src/crm_overrides/` at build time and bundles it. A standalone CRM image omits the app → clean bundle.
+
+**The one ordering variable to confirm in the spike:** the CRM SPA must be compiled *after* `videojet_crm_override` is on disk. The deploy-time `configurator` build satisfies this (all apps already present). If image-build-time SPA compilation turns out to run per-app before later apps clone, the fix is trivial — either list `videojet_crm_override` before `crm` in the manifest, or add an explicit "rebuild crm frontend after all apps cloned" step. The spike will confirm which path applies before we rely on it.
+
+### Plans (dms_only / dms_plus_crm / dms_full / crm_only) — unaffected
+
+Plans gate **pillar enablement**, not app presence: `apply_tenant_plan(code)` sets `DMS Settings.active_plan` → `pillars_enabled`, which drives module profiles, desktop-icon visibility, and `requires_pillar()` server gates. `videojet_crm_override` is a CRM-layer app baked into the image; its overrides are active **whenever the CRM SPA is served**, i.e. whenever the plan enables the CRM pillar:
+
+- `dms_full`, `dms_plus_crm` → CRM enabled → overrides apply (Products tab, Getting-Started hidden). Works as expected.
+- `dms_only` → CRM pillar off → CRM SPA not reachable → overrides dormant and harmless.
+- `crm_only` (future standalone) → would NOT include `videojet_crm_override` in its manifest anyway.
+
+The plan applier needs **no knowledge** of `videojet_crm_override`. Its server-side hooks/fixtures (if any) must be `requires_pillar("crm")`-gated for cleanliness, matching the DMS pattern, so they no-op when CRM is absent.
+
+## 9. Open Questions / Spec-time validations
 
 - Exact `vite.config.js` `server.fs.allow` and the bench `apps/` path resolution in both dev and the frappe_docker build context.
 - Whether the frappe-ui Vite plugin reorders/overrides plugin hooks in a way that affects virtual-module resolution (validate in the spike).
