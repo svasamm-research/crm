@@ -56,6 +56,7 @@ export default defineConfig(async ({ mode }) => {
       }),
       crmOverrides({
         appsDir: path.resolve(__dirname, '../..'),
+        frontendSrc: path.resolve(__dirname, 'src'),
         registryPath: path.resolve(__dirname, 'src/extensions/registry.js'),
       }),
     ],
