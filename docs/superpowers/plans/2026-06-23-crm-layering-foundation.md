@@ -64,21 +64,19 @@ Expected: app created under `apps/videojet_crm_override`, installed without erro
 
 - [ ] **Step 2: Add the smoke override entrypoint**
 
-Create `apps/videojet_crm_override/frontend/src/crm_overrides/index.js`:
+Create `apps/videojet_crm_override/frontend/src/crm_overrides/index.js`. NOTE: use a **render function** (`h(...)`), not an inline `template:` string — the CRM Vite build is runtime-compiler-less, so string templates do not render.
 ```js
 // Smoke override — proves the cross-app mechanism end to end.
 // Replaced by the real Products tab (Task 5) and Getting-Started flag (Task 6).
+import { h } from 'vue'
+
+const SmokeTab = {
+  render: () => h('div', { class: 'p-10' }, 'crm_overrides smoke tab'),
+}
+
 export function register(registry) {
-  registry.registerLeadTab({
-    name: '__Smoke',
-    label: 'Smoke',
-    component: { template: '<div class="p-10">crm_overrides smoke tab</div>' },
-  })
-  registry.registerDealTab({
-    name: '__Smoke',
-    label: 'Smoke',
-    component: { template: '<div class="p-10">crm_overrides smoke tab</div>' },
-  })
+  registry.registerLeadTab({ name: '__Smoke', label: 'Smoke', component: SmokeTab })
+  registry.registerDealTab({ name: '__Smoke', label: 'Smoke', component: SmokeTab })
 }
 ```
 
