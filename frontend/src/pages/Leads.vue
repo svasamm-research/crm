@@ -201,25 +201,45 @@
     <template #actions="{ itemName }">
       <div class="flex gap-2 items-center justify-between">
         <div class="text-ink-gray-5 flex items-center gap-1.5">
-          <EmailAtIcon class="h-4 w-4" />
-          <span v-if="getRow(itemName, '_email_count').label">
-            {{ getRow(itemName, '_email_count').label }}
-          </span>
+          <button
+            class="flex items-center gap-1.5 hover:text-ink-gray-7"
+            @click.stop.prevent="openTab(itemName, 'emails')"
+          >
+            <EmailAtIcon class="h-4 w-4" />
+            <span v-if="getRow(itemName, '_email_count').label">
+              {{ getRow(itemName, '_email_count').label }}
+            </span>
+          </button>
           <span class="text-3xl leading-[0]"> &middot; </span>
-          <NoteIcon class="h-4 w-4" />
-          <span v-if="getRow(itemName, '_note_count').label">
-            {{ getRow(itemName, '_note_count').label }}
-          </span>
+          <button
+            class="flex items-center gap-1.5 hover:text-ink-gray-7"
+            @click.stop.prevent="openTab(itemName, 'notes')"
+          >
+            <NoteIcon class="h-4 w-4" />
+            <span v-if="getRow(itemName, '_note_count').label">
+              {{ getRow(itemName, '_note_count').label }}
+            </span>
+          </button>
           <span class="text-3xl leading-[0]"> &middot; </span>
-          <TaskIcon class="h-4 w-4" />
-          <span v-if="getRow(itemName, '_task_count').label">
-            {{ getRow(itemName, '_task_count').label }}
-          </span>
+          <button
+            class="flex items-center gap-1.5 hover:text-ink-gray-7"
+            @click.stop.prevent="openTab(itemName, 'tasks')"
+          >
+            <TaskIcon class="h-4 w-4" />
+            <span v-if="getRow(itemName, '_task_count').label">
+              {{ getRow(itemName, '_task_count').label }}
+            </span>
+          </button>
           <span class="text-3xl leading-[0]"> &middot; </span>
-          <CommentIcon class="h-4 w-4" />
-          <span v-if="getRow(itemName, '_comment_count').label">
-            {{ getRow(itemName, '_comment_count').label }}
-          </span>
+          <button
+            class="flex items-center gap-1.5 hover:text-ink-gray-7"
+            @click.stop.prevent="openTab(itemName, 'comments')"
+          >
+            <CommentIcon class="h-4 w-4" />
+            <span v-if="getRow(itemName, '_comment_count').label">
+              {{ getRow(itemName, '_comment_count').label }}
+            </span>
+          </button>
         </div>
         <Dropdown
           class="flex items-center gap-2"
@@ -308,7 +328,7 @@ import { callEnabled } from '@/composables/settings'
 import { useBroadcast } from '@/composables/useBroadcast'
 import { formatDate, timeAgo, website, formatTime } from '@/utils'
 import { Avatar, Tooltip, Dropdown } from 'frappe-ui'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { ref, computed, reactive, h } from 'vue'
 
 const { getFormattedPercent, getFormattedFloat, getFormattedCurrency } =
@@ -319,6 +339,12 @@ const { getLeadStatus } = statusesStore()
 const { on } = useBroadcast()
 
 const route = useRoute()
+const router = useRouter()
+
+// Card footer icons deep-link to the lead on the matching tab.
+function openTab(name, tab) {
+  router.push({ name: 'Lead', params: { leadId: name }, hash: '#' + tab })
+}
 
 const leadsListView = ref(null)
 const showLeadModal = ref(false)
