@@ -138,6 +138,27 @@ export function register(registry) {
 }
 ```
 
+### 3.4 Multiple tenants / onboarding a new client (e.g. Britannia)
+
+The mechanism is **tenant-agnostic by construction** — nothing in the base fork names "videojet". The plugin discovers *any* sibling app that ships `frontend/src/crm_overrides/index.js`, and the runtime registry composes whatever those apps register.
+
+**Isolation is at the image/deployment layer, not runtime** — the same model as DMS (each tenant runs its own image on its own server, per-server DB). Each tenant has its own image manifest:
+
+- `apps/dms-uat.json` → `crm` + `svasamm_crm_defaults` + **`videojet_crm_override`**
+- `apps/britannia-uat.json` → `crm` + `svasamm_crm_defaults` + **`britannia_crm_override`**
+
+So a given build contains **exactly one** tenant override; the Videojet build never sees Britannia's code and vice-versa. No runtime tenant-detection, no cross-tenant leakage.
+
+**Onboarding Britannia is purely additive:**
+
+1. `bench new-app britannia_crm_override` with the same convention (Python/fixtures for server/data + `frontend/src/crm_overrides/index.js` for Vue).
+2. Implement Britannia's deltas against the same `registry` API (its own tabs, flags, modals) and its own server hooks/fixtures.
+3. Add it to `apps/britannia-uat.json` and wire a Britannia image build.
+
+**Zero changes** to the `crm` fork, `svasamm_crm_defaults`, `videojet_crm_override`, or the mechanism. This is exactly how `videojet_override` → a future `britannia_override` works on the DMS server side; we are extending the same per-tenant-app model to the SPA.
+
+**If two override apps are ever present in one build** (rare — e.g. a shared optional bundle like `svasamm_crm_premium` reused across tenants): discovery order is deterministic (apps scanned in sorted order); the registry dedupes by `name` with last-registered-wins, and a future `priority` field can make precedence explicit. Single-tenant images avoid this entirely, so it is not a v1 concern — but the registry is designed so composition is well-defined, not accidental.
+
 ## 4. Migrations onto the mechanism (this spec's deliverables)
 
 1. **Extract the Products tab** from the fork's core files into `videojet_crm_override/frontend/src/crm_overrides/ProductsTab.vue` (absorbing `ProductsArea.vue` logic), and remove the interleaved Products references from `Lead.vue`, `Deal.vue`, `Activities.vue`, `ActivityHeader.vue`. Register it via `crm_overrides/index.js`. The base fork goes back to clean upstream-shaped tabs.
