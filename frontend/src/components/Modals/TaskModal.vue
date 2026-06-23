@@ -6,10 +6,10 @@
           {{ editMode ? __('Edit Task') : __('Create Task') }}
         </h3>
         <Button
-          v-if="task?.reference_docname"
+          v-if="_task.reference_docname"
           size="sm"
           :label="
-            task.reference_doctype == 'CRM Deal'
+            _task.reference_doctype == 'CRM Deal'
               ? __('Open Deal')
               : __('Open Lead')
           "
@@ -29,6 +29,27 @@
             :placeholder="__('Call with John Doe')"
             required
           />
+        </div>
+        <div class="space-y-1.5">
+          <FormLabel :label="__('Link to')" />
+          <div class="flex items-center gap-2">
+            <Dropdown :options="referenceTypeOptions">
+              <Button
+                :label="
+                  _task.reference_doctype === 'CRM Deal'
+                    ? __('Deal')
+                    : __('Lead')
+                "
+              />
+            </Dropdown>
+            <Link
+              class="form-control flex-1"
+              :doctype="_task.reference_doctype || 'CRM Lead'"
+              :value="_task.reference_docname"
+              :placeholder="__('Select a lead or deal')"
+              @change="(v) => (_task.reference_docname = v)"
+            />
+          </div>
         </div>
         <div>
           <div class="mb-1.5 text-xs text-ink-gray-5">
@@ -164,6 +185,16 @@ const _task = ref({
   reference_docname: null,
 })
 
+const referenceTypeOptions = [
+  { label: __('Lead'), onClick: () => setReferenceType('CRM Lead') },
+  { label: __('Deal'), onClick: () => setReferenceType('CRM Deal') },
+]
+
+function setReferenceType(dt) {
+  _task.value.reference_doctype = dt
+  _task.value.reference_docname = null
+}
+
 const validateTask = () => {
   if (!_task.value.title) {
     toast.error(__('Title is required'))
@@ -178,8 +209,6 @@ const createTaskResource = createResource({
     return {
       doc: {
         doctype: 'CRM Task',
-        reference_doctype: props.doctype,
-        reference_docname: props.doc || null,
         ..._task.value,
       },
     }
@@ -225,11 +254,11 @@ function updateTaskPriority(priority) {
 }
 
 function redirect() {
-  if (!props.task?.reference_docname) return
-  let name = props.task.reference_doctype == 'CRM Deal' ? 'Deal' : 'Lead'
-  let params = { leadId: props.task.reference_docname }
+  if (!_task.value?.reference_docname) return
+  let name = _task.value.reference_doctype == 'CRM Deal' ? 'Deal' : 'Lead'
+  let params = { leadId: _task.value.reference_docname }
   if (name == 'Deal') {
-    params = { dealId: props.task.reference_docname }
+    params = { dealId: _task.value.reference_docname }
   }
   router.push({ name: name, params: params })
 }
@@ -249,7 +278,11 @@ function render() {
   editMode.value = false
   nextTick(() => {
     title.value?.el?.focus?.()
-    _task.value = { ...props.task }
+    _task.value = {
+      reference_doctype: props.doctype,
+      reference_docname: props.doc || null,
+      ...props.task,
+    }
     if (_task.value.title) {
       editMode.value = true
     }

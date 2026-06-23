@@ -29,6 +29,27 @@
             required
           />
         </div>
+        <div class="space-y-1.5">
+          <FormLabel :label="__('Link to')" />
+          <div class="flex items-center gap-2">
+            <Dropdown :options="referenceTypeOptions">
+              <Button
+                :label="
+                  _note.reference_doctype === 'CRM Deal'
+                    ? __('Deal')
+                    : __('Lead')
+                "
+              />
+            </Dropdown>
+            <Link
+              class="form-control flex-1"
+              :doctype="_note.reference_doctype || 'CRM Lead'"
+              :value="_note.reference_docname"
+              :placeholder="__('Select a lead or deal')"
+              @change="(v) => (_note.reference_docname = v)"
+            />
+          </div>
+        </div>
         <div>
           <div class="mb-1.5 text-xs text-ink-gray-5">{{ __('Content') }}</div>
           <TextEditor
@@ -60,7 +81,8 @@
 
 <script setup>
 import ArrowUpRightIcon from '@/components/Icons/ArrowUpRightIcon.vue'
-import { TextEditor, call } from 'frappe-ui'
+import Link from '@/components/Controls/Link.vue'
+import { TextEditor, call, Dropdown, FormLabel } from 'frappe-ui'
 import { useOnboarding, useTelemetry } from 'frappe-ui/frappe'
 import { ref, nextTick, watch } from 'vue'
 import { useRouter } from 'vue-router'
@@ -86,6 +108,16 @@ const title = ref(null)
 const editMode = ref(false)
 let _note = ref({})
 
+const referenceTypeOptions = [
+  { label: __('Lead'), onClick: () => setReferenceType('CRM Lead') },
+  { label: __('Deal'), onClick: () => setReferenceType('CRM Deal') },
+]
+
+function setReferenceType(dt) {
+  _note.value.reference_doctype = dt
+  _note.value.reference_docname = null
+}
+
 async function updateNote() {
   if (_note.value.name) {
     let d = await call('frappe.client.set_value', {
@@ -105,8 +137,8 @@ async function updateNote() {
           doctype: 'FCRM Note',
           title: _note.value.title,
           content: _note.value.content,
-          reference_doctype: props.doctype,
-          reference_docname: props.doc || '',
+          reference_doctype: _note.value.reference_doctype,
+          reference_docname: _note.value.reference_docname || '',
         },
       },
       {
@@ -128,11 +160,11 @@ async function updateNote() {
 }
 
 function redirect() {
-  if (!props.note?.reference_docname) return
-  let name = props.note.reference_doctype == 'CRM Deal' ? 'Deal' : 'Lead'
-  let params = { leadId: props.note.reference_docname }
+  if (!_note.value?.reference_docname) return
+  let name = _note.value.reference_doctype == 'CRM Deal' ? 'Deal' : 'Lead'
+  let params = { leadId: _note.value.reference_docname }
   if (name == 'Deal') {
-    params = { dealId: props.note.reference_docname }
+    params = { dealId: _note.value.reference_docname }
   }
   router.push({ name: name, params: params })
 }
@@ -144,7 +176,11 @@ watch(
     editMode.value = false
     nextTick(() => {
       title.value?.el?.focus()
-      _note.value = { ...props.note }
+      _note.value = {
+        reference_doctype: props.doctype,
+        reference_docname: props.doc || null,
+        ...props.note,
+      }
       if (_note.value.title || _note.value.content) {
         editMode.value = true
       }
