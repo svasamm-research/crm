@@ -348,7 +348,6 @@ import DetailsIcon from '@/components/Icons/DetailsIcon.vue'
 import PhoneIcon from '@/components/Icons/PhoneIcon.vue'
 import TaskIcon from '@/components/Icons/TaskIcon.vue'
 import NoteIcon from '@/components/Icons/NoteIcon.vue'
-import ProductsIcon from '@/components/Icons/ProductsIcon.vue'
 import WhatsAppIcon from '@/components/Icons/WhatsAppIcon.vue'
 import IndicatorIcon from '@/components/Icons/IndicatorIcon.vue'
 import LinkIcon from '@/components/Icons/LinkIcon.vue'
@@ -404,6 +403,7 @@ import {
 } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useActiveTabManager } from '@/composables/useActiveTabManager'
+import { useExtensions, applyExtensionTabs } from '@/extensions/registry'
 
 const { on } = useBroadcast()
 const { brand } = getSettings()
@@ -553,6 +553,8 @@ usePageMeta(() => {
   }
 })
 
+const ext = useExtensions()
+
 const tabs = computed(() => {
   let tabOptions = [
     {
@@ -591,11 +593,6 @@ const tabs = computed(() => {
       icon: NoteIcon,
     },
     {
-      name: 'Products',
-      label: __('Products'),
-      icon: ProductsIcon,
-    },
-    {
       name: 'Attachments',
       label: __('Attachments'),
       icon: AttachmentIcon,
@@ -607,7 +604,9 @@ const tabs = computed(() => {
       condition: () => whatsappEnabled.value,
     },
   ]
-  return tabOptions.filter((tab) => (tab.condition ? tab.condition() : true))
+  return applyExtensionTabs(tabOptions, ext.dealTabs).filter((tab) =>
+    tab.condition ? tab.condition() : true,
+  )
 })
 
 const { tabIndex } = useActiveTabManager(tabs, 'lastDealTab')

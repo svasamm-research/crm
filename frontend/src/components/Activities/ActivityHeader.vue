@@ -1,6 +1,6 @@
 <template>
   <div
-    v-if="!['Data', 'Products'].includes(title)"
+    v-if="!['Data'].includes(title) && !extHidesHeader"
     class="mx-4 my-3 flex items-center justify-between text-lg font-medium sm:mx-10 sm:mb-4 sm:mt-8"
   >
     <div class="flex h-8 items-center text-xl font-semibold text-ink-gray-8">
@@ -94,6 +94,11 @@ const props = defineProps({
 })
 
 const { makeCall } = globalStore()
+
+// Registry-contributed tabs may opt out of the generic activity header.
+const extHidesHeader = computed(() =>
+  props.tabs?.find((t) => t.name === props.title)?.hideActivityHeader,
+)
 
 const tabIndex = defineModel({ type: Number })
 const showWhatsappTemplates = defineModel('showWhatsappTemplates', {
