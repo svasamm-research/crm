@@ -7,6 +7,7 @@ import { initSocket } from './socket'
 import router from './router'
 import translationPlugin from './translation'
 import App from './App.vue'
+import 'virtual:crm-overrides'
 
 import {
   FrappeUI,
