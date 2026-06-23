@@ -23,7 +23,7 @@
 ## File Structure
 
 **crm fork (`apps/crm`):**
-- Create `frontend/build/crm-overrides-plugin.js` — Vite plugin: scans sibling apps, emits `virtual:crm-overrides`.
+- Create `frontend/crm-overrides-plugin.js` — Vite plugin: scans sibling apps, emits `virtual:crm-overrides`.
 - Create `frontend/src/extensions/registry.js` — reactive registry singleton + `applyExtensionTabs` helper.
 - Modify `frontend/vite.config.js` — register the plugin; widen `server.fs.allow` to the bench apps dir.
 - Modify `frontend/src/main.js` — `import 'virtual:crm-overrides'`.
@@ -95,7 +95,7 @@ Expected: override app committed in `apps/videojet_crm_override`.
 
 **Files:**
 - Create: `apps/crm/frontend/src/extensions/registry.js`
-- Create: `apps/crm/frontend/build/crm-overrides-plugin.js`
+- Create: `apps/crm/frontend/crm-overrides-plugin.js`
 - Modify: `apps/crm/frontend/vite.config.js`
 - Modify: `apps/crm/frontend/src/main.js`
 
@@ -158,7 +158,7 @@ export function applyExtensionTabs(builtin, extTabs) {
 
 - [ ] **Step 2: Write the Vite plugin**
 
-Create `apps/crm/frontend/build/crm-overrides-plugin.js`:
+Create `apps/crm/frontend/crm-overrides-plugin.js`:
 ```js
 import fs from 'node:fs'
 import path from 'node:path'
@@ -261,7 +261,7 @@ Expected: build succeeds, **no** reference to the smoke override in the output (
 - [ ] **Step 7: Commit**
 
 ```bash
-git -C apps/crm add frontend/src/extensions/registry.js frontend/build/crm-overrides-plugin.js frontend/vite.config.js frontend/src/main.js
+git -C apps/crm add frontend/src/extensions/registry.js frontend/crm-overrides-plugin.js frontend/vite.config.js frontend/src/main.js
 git -C apps/crm commit -m "feat(crm): build-time extension mechanism (registry + crm_overrides Vite plugin)"
 ```
 
