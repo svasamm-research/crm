@@ -175,25 +175,45 @@
     <template #actions="{ itemName }">
       <div class="flex gap-2 items-center justify-between">
         <div class="text-ink-gray-5 flex items-center gap-1.5">
-          <EmailAtIcon class="h-4 w-4" />
-          <span v-if="getRow(itemName, '_email_count').label">
-            {{ getRow(itemName, '_email_count').label }}
-          </span>
+          <button
+            class="flex items-center gap-1.5 hover:text-ink-gray-7"
+            @click.stop.prevent="openTab(itemName, 'emails')"
+          >
+            <EmailAtIcon class="h-4 w-4" />
+            <span v-if="getRow(itemName, '_email_count').label">
+              {{ getRow(itemName, '_email_count').label }}
+            </span>
+          </button>
           <span class="text-3xl leading-[0]"> &middot; </span>
-          <NoteIcon class="h-4 w-4" />
-          <span v-if="getRow(itemName, '_note_count').label">
-            {{ getRow(itemName, '_note_count').label }}
-          </span>
+          <button
+            class="flex items-center gap-1.5 hover:text-ink-gray-7"
+            @click.stop.prevent="openTab(itemName, 'notes')"
+          >
+            <NoteIcon class="h-4 w-4" />
+            <span v-if="getRow(itemName, '_note_count').label">
+              {{ getRow(itemName, '_note_count').label }}
+            </span>
+          </button>
           <span class="text-3xl leading-[0]"> &middot; </span>
-          <TaskIcon class="h-4 w-4" />
-          <span v-if="getRow(itemName, '_task_count').label">
-            {{ getRow(itemName, '_task_count').label }}
-          </span>
+          <button
+            class="flex items-center gap-1.5 hover:text-ink-gray-7"
+            @click.stop.prevent="openTab(itemName, 'tasks')"
+          >
+            <TaskIcon class="h-4 w-4" />
+            <span v-if="getRow(itemName, '_task_count').label">
+              {{ getRow(itemName, '_task_count').label }}
+            </span>
+          </button>
           <span class="text-3xl leading-[0]"> &middot; </span>
-          <CommentIcon class="h-4 w-4" />
-          <span v-if="getRow(itemName, '_comment_count').label">
-            {{ getRow(itemName, '_comment_count').label }}
-          </span>
+          <button
+            class="flex items-center gap-1.5 hover:text-ink-gray-7"
+            @click.stop.prevent="openTab(itemName, 'comments')"
+          >
+            <CommentIcon class="h-4 w-4" />
+            <span v-if="getRow(itemName, '_comment_count').label">
+              {{ getRow(itemName, '_comment_count').label }}
+            </span>
+          </button>
         </div>
         <Dropdown
           class="flex items-center gap-2"
@@ -282,7 +302,7 @@ import { statusesStore } from '@/stores/statuses'
 import { callEnabled } from '@/composables/settings'
 import { formatDate, timeAgo, website, formatTime } from '@/utils'
 import { Tooltip, Avatar, Dropdown } from 'frappe-ui'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { ref, reactive, computed, h } from 'vue'
 
 const { getFormattedPercent, getFormattedFloat, getFormattedCurrency } =
@@ -539,6 +559,13 @@ const note = ref({
   title: '',
   content: '',
 })
+
+const router = useRouter()
+
+// Card footer icons deep-link to the deal on the matching tab.
+function openTab(name, tab) {
+  router.push({ name: 'Deal', params: { dealId: name }, hash: '#' + tab })
+}
 
 function showNote(name) {
   docname.value = name

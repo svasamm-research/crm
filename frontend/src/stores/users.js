@@ -92,6 +92,31 @@ export const usersStore = defineStore('crm-users', () => {
     return roles.some((r) => adminRoles.includes(r))
   }
 
+  // DMS / videojet_override deployments map each user to either a Distributor
+  // (Distributor Admin / Distributor Sales User / ...) or the OEM/tenant admin
+  // tier. On stock CRM-only deployments these role names don't exist, so
+  // isDistributor() is always false and isOEM() falls back to the admin tier.
+  function isOEM(email) {
+    const u = getUser(email)
+    const oemRoles = [
+      'System Manager',
+      'Administrator',
+      'OEM Admin',
+      'OEM Sales Admin',
+    ]
+    const roles = u.roles || (u.role ? [u.role] : [])
+    return roles.some((r) => oemRoles.includes(r))
+  }
+
+  // A distributor user carries a Distributor role and is NOT in the OEM/admin
+  // tier. (Super-admin accounts can hold both Distributor and OEM roles — they
+  // are treated as OEM, mirroring dms._is_oem_user.)
+  function isDistributor(email) {
+    const u = getUser(email)
+    const roles = u.roles || (u.role ? [u.role] : [])
+    return roles.some((r) => r.startsWith('Distributor')) && !isOEM(email)
+  }
+
   function isWebsiteUser(email) {
     return getUser(email).user_type === 'Website User'
   }
@@ -129,6 +154,8 @@ export const usersStore = defineStore('crm-users', () => {
     isTelephonyAgent,
     getUserRole,
     isWebsiteUser,
+    isDistributor,
+    isOEM,
     isCrmUser,
   }
 })

@@ -204,7 +204,11 @@ router.beforeEach(async (to, from, next) => {
       }
 
       const doctype = doctypeMap[to.name]
-      let defaultViewType = 'list'
+      // Svasamm default: Kanban for the pipeline-style lists; List elsewhere.
+      // A user's saved default / an is_default standard view still overrides
+      // this below.
+      const preferredDefault = { Leads: 'kanban', Deals: 'kanban', Tasks: 'kanban' }
+      let defaultViewType = preferredDefault[to.name] || 'list'
 
       let globalDefault = getDefaultView()
       if (globalDefault && globalDefault.route_name === to.name) {

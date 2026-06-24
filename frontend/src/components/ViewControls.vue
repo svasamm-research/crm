@@ -358,7 +358,7 @@ const props = defineProps({
 const { brand } = getSettings()
 const { $dialog } = globalStore()
 const { reload: reloadView, getDefaultView, getView } = viewsStore()
-const { isManager } = usersStore()
+const { isManager, isOEM } = usersStore()
 
 const list = defineModel({ type: Object, default: () => ({}) })
 const loadMore = defineModel('loadMore', { type: Boolean })
@@ -783,7 +783,12 @@ const quickFilterOptions = computed(() => {
 })
 
 const quickFilterList = computed(() => {
-  let filters = quickFilters.data || []
+  // The distributor quick filter is for OEM/admin users only — distributor
+  // users are already scoped to their own records. (No-op on standalone CRM
+  // where custom_distributor does not exist.)
+  let filters = (quickFilters.data || []).filter(
+    (f) => f.fieldname !== 'custom_distributor' || isOEM(),
+  )
 
   filters.forEach((filter) => {
     filter['value'] = filter.fieldtype == 'Check' ? false : ''
