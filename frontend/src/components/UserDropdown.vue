@@ -67,7 +67,7 @@ defineProps({
 
 const { settings, brand } = getSettings()
 const { logout } = sessionStore()
-const { getUser } = usersStore()
+const { getUser, isDistributor } = usersStore()
 
 const user = computed(() => getUser() || {})
 
@@ -133,7 +133,7 @@ function getStandardItem(item) {
         icon: item.icon,
         label: __(item.label),
         onClick: () => (showSettings.value = true),
-        condition: () => !isMobileView.value,
+        condition: () => !isMobileView.value && !isDistributor(),
       }
     case 'login_to_fc':
       return {

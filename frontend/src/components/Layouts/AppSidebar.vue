@@ -82,7 +82,7 @@
           :afterUpgrade="() => capture('upgrade_plan_from_trial_banner')"
         />
         <GettingStartedBanner
-          v-if="!isOnboardingStepsCompleted"
+          v-if="!isOnboardingStepsCompleted && gettingStartedEnabled"
           :isSidebarCollapsed="isSidebarCollapsed"
         />
       </div>
@@ -98,7 +98,7 @@
         </template>
       </SidebarLink>
       <SidebarLink
-        v-if="isOnboardingStepsCompleted"
+        v-if="isOnboardingStepsCompleted && gettingStartedEnabled"
         :label="__('Help')"
         :isCollapsed="isSidebarCollapsed"
         @click="
@@ -131,7 +131,7 @@
     <Notifications />
     <Settings />
     <HelpModal
-      v-if="showHelpModal"
+      v-if="showHelpModal && gettingStartedEnabled"
       v-model="showHelpModal"
       v-model:articles="articles"
       :logo="CRMLogo"
@@ -203,6 +203,7 @@ import router from '@/router'
 import { useStorage } from '@vueuse/core'
 import { useDemoData } from '@/composables/demoData'
 import { ref, reactive, computed, markRaw, onMounted } from 'vue'
+import { useExtensions } from '@/extensions/registry'
 
 const { getPinnedViews, getPublicViews } = viewsStore()
 const { toggle: toggleNotificationPanel } = notificationsStore()
@@ -329,6 +330,12 @@ function getIcon(routeName, icon) {
 const { user } = sessionStore()
 const { users, isManager } = usersStore()
 const { isOnboardingStepsCompleted, setUp } = useOnboarding('frappecrm')
+
+// Tenant overrides can hide the Getting-Started onboarding via this flag.
+// Unset -> shown (upstream default); only an explicit false hides it.
+const gettingStartedEnabled = computed(
+  () => useExtensions().featureFlags.gettingStarted !== false,
+)
 
 async function getFirstLead() {
   let firstLead = localStorage.getItem('firstLead' + user)

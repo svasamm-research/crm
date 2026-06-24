@@ -388,8 +388,12 @@
         @afterSave="(data) => emit('afterSave', data)"
       />
     </div>
-    <div v-else-if="title == 'Products'" class="h-full flex flex-col">
-      <ProductsArea :doctype="doctype" :docname="docname" />
+    <div v-else-if="extensionTab" class="h-full flex flex-col">
+      <component
+        :is="extensionTab.component"
+        :doctype="doctype"
+        :docname="docname"
+      />
     </div>
     <EmptyState
       v-else
@@ -451,7 +455,6 @@ import NoteArea from '@/components/Activities/NoteArea.vue'
 import TaskArea from '@/components/Activities/TaskArea.vue'
 import AttachmentArea from '@/components/Activities/AttachmentArea.vue'
 import DataFields from '@/components/Activities/DataFields.vue'
-import ProductsArea from '@/components/Activities/ProductsArea.vue'
 import UserAvatar from '@/components/UserAvatar.vue'
 import ActivityIcon from '@/components/Icons/ActivityIcon.vue'
 import EmailIcon from '@/components/Icons/EmailIcon.vue'
@@ -525,6 +528,12 @@ const modalRef = ref(null)
 const showFilesUploader = ref(false)
 
 const title = computed(() => props.tabs?.[tabIndex.value]?.name || 'Activity')
+
+// A registry-contributed tab carries its own `component`; built-in tabs do
+// not. Match the active tab name against the (already-merged) tabs prop.
+const extensionTab = computed(() =>
+  props.tabs?.find((t) => t.name === title.value && t.component),
+)
 
 const changeTabTo = (tabName) => {
   const tabNames = props.tabs?.map((tab) => tab.name?.toLowerCase())

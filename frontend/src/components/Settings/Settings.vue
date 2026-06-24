@@ -71,6 +71,7 @@ import TelephonyPage from '@/components/Settings/Telephony/TelephonyPage.vue'
 import EmailConfig from '@/components/Settings/EmailConfig.vue'
 import SidebarLink from '@/components/SidebarLink.vue'
 import { usersStore } from '@/stores/users'
+import { useExtensions } from '@/extensions/registry'
 import {
   isWhatsappInstalled,
   showSettings,
@@ -81,9 +82,20 @@ import { Dialog, Avatar } from 'frappe-ui'
 import { ref, markRaw, computed, watch, h } from 'vue'
 import AssignmentRulePage from './AssignmentRules/AssignmentRulePage.vue'
 
-const { isManager, getUser } = usersStore()
+const { isManager, getUser, isDistributor } = usersStore()
+const ext = useExtensions()
 
 const user = computed(() => getUser() || {})
+
+// Distributor users cannot reach Settings at all (no route exists; this guard
+// closes the modal even if something tries to open it).
+watch(
+  showSettings,
+  (val) => {
+    if (val && isDistributor()) showSettings.value = false
+  },
+  { immediate: true },
+)
 
 const tabs = computed(() => {
   let _tabs = [
@@ -219,13 +231,21 @@ const tabs = computed(() => {
     },
   ]
 
+  // Tenant overrides can hide specific settings sections by label (Videojet
+  // trims Brand / Accounts / Templates / Home Actions / ERPNext). A group whose
+  // items all get hidden is dropped too.
+  const hidden = ext.featureFlags.hiddenSettingsTabs || []
+
   return _tabs.filter((tab) => {
     if (tab.condition && !tab.condition()) return false
+    if (hidden.includes(tab.label)) return false
     if (tab.items) {
       tab.items = tab.items.filter((item) => {
         if (item.condition && !item.condition()) return false
+        if (hidden.includes(item.label)) return false
         return true
       })
+      if (!tab.items.length) return false
     }
     return true
   })

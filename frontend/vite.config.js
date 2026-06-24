@@ -3,6 +3,7 @@ import vue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
 import path from 'path'
 import { VitePWA } from 'vite-plugin-pwa'
+import { crmOverrides } from './crm-overrides-plugin.js'
 
 // https://vitejs.dev/config/
 export default defineConfig(async ({ mode }) => {
@@ -53,6 +54,11 @@ export default defineConfig(async ({ mode }) => {
           ],
         },
       }),
+      crmOverrides({
+        appsDir: path.resolve(__dirname, '../..'),
+        frontendSrc: path.resolve(__dirname, 'src'),
+        registryPath: path.resolve(__dirname, 'src/extensions/registry.js'),
+      }),
     ],
     resolve: {
       alias: {
@@ -71,7 +77,10 @@ export default defineConfig(async ({ mode }) => {
     },
     server: {
       fs: {
-        allow: [path.resolve(__dirname, '..')],
+        allow: [
+          path.resolve(__dirname, '..'),
+          path.resolve(__dirname, '../..'),
+        ],
       },
     },
   }
