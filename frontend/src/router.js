@@ -169,21 +169,22 @@ router.beforeEach(async (to, from, next) => {
   } else if (!isLoggedIn) {
     window.location.href = '/login?redirect-to=/crm'
   } else if (to.matched.length === 0) {
-    // Check if the unmatched route corresponds to a registered extension view.
-    // virtual:crm-overrides is imported after createRouter() runs in main.js
-    // (line 10 comes after `import router from './router'` on line 7), so
-    // extension views are never in the static routes array. We inject them
-    // lazily here on first navigation attempt.
+    // The unmatched route may be a registered extension view. virtual:crm-overrides
+    // is imported AFTER createRouter() runs in main.js (line 10 after the router
+    // import on line 7), so extension views aren't in the static routes array.
+    // Inject any not-yet-added extension views and retry once, letting the router
+    // do native path matching (registered paths carry params like :viewType? that
+    // won't string-equal a concrete to.path). hasRoute() guards against re-adding,
+    // so a genuinely unknown route falls through to Invalid Page (no loop).
     const extViews = useExtensions().views
-    const extView = extViews.find(
-      (v) => v.name === to.name || v.path === to.path,
-    )
-    if (extView) {
-      router.addRoute({
-        name: extView.name,
-        path: extView.path,
-        component: extView.component,
-      })
+    let added = false
+    for (const v of extViews) {
+      if (!router.hasRoute(v.name)) {
+        router.addRoute({ name: v.name, path: v.path, component: v.component })
+        added = true
+      }
+    }
+    if (added) {
       next({ ...to })
     } else {
       next({ name: 'Invalid Page' })
