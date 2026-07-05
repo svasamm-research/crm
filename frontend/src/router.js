@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import { usersStore } from '@/stores/users'
 import { sessionStore } from '@/stores/session'
 import { viewsStore } from '@/stores/views'
+import { useExtensions } from '@/extensions/registry'
 
 const routes = [
   {
@@ -168,7 +169,25 @@ router.beforeEach(async (to, from, next) => {
   } else if (!isLoggedIn) {
     window.location.href = '/login?redirect-to=/crm'
   } else if (to.matched.length === 0) {
-    next({ name: 'Invalid Page' })
+    // Check if the unmatched route corresponds to a registered extension view.
+    // virtual:crm-overrides is imported after createRouter() runs in main.js
+    // (line 10 comes after `import router from './router'` on line 7), so
+    // extension views are never in the static routes array. We inject them
+    // lazily here on first navigation attempt.
+    const extViews = useExtensions().views
+    const extView = extViews.find(
+      (v) => v.name === to.name || v.path === to.path,
+    )
+    if (extView) {
+      router.addRoute({
+        name: extView.name,
+        path: extView.path,
+        component: extView.component,
+      })
+      next({ ...to })
+    } else {
+      next({ name: 'Invalid Page' })
+    }
   } else if (['Deal', 'Lead'].includes(to.name) && !to.hash) {
     let storageKey = to.name === 'Deal' ? 'lastDealTab' : 'lastLeadTab'
     const activeTab = localStorage.getItem(storageKey) || 'activity'
