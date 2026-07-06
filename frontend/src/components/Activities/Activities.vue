@@ -493,7 +493,6 @@ import { useElementVisibility } from '@vueuse/core'
 import {
   ref,
   computed,
-  h,
   markRaw,
   watch,
   nextTick,
@@ -770,7 +769,7 @@ const emptyTextIcon = computed(() => {
   } else if (title.value == 'WhatsApp') {
     icon = WhatsAppIcon
   }
-  return h(icon, { class: 'text-ink-gray-4' })
+  return icon
 })
 
 function timelineIcon(activity_type, is_lead) {
