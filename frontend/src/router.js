@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import { usersStore } from '@/stores/users'
 import { sessionStore } from '@/stores/session'
 import { viewsStore } from '@/stores/views'
+import { useExtensions } from '@/extensions/registry'
 
 const routes = [
   {
@@ -149,12 +150,12 @@ router.beforeEach(async (to, from, next) => {
 
     let defaultView = getDefaultView()
     if (!defaultView) {
-      next({ name: 'Leads' })
+      next({ name: 'Dashboard' })
       return
     }
 
     let { route_name, type, name, is_standard } = defaultView
-    route_name = route_name || 'Leads'
+    route_name = route_name || 'Dashboard'
 
     if (name && !is_standard) {
       next({
@@ -168,7 +169,26 @@ router.beforeEach(async (to, from, next) => {
   } else if (!isLoggedIn) {
     window.location.href = '/login?redirect-to=/crm'
   } else if (to.matched.length === 0) {
-    next({ name: 'Invalid Page' })
+    // The unmatched route may be a registered extension view. virtual:crm-overrides
+    // is imported AFTER createRouter() runs in main.js (line 10 after the router
+    // import on line 7), so extension views aren't in the static routes array.
+    // Inject any not-yet-added extension views and retry once, letting the router
+    // do native path matching (registered paths carry params like :viewType? that
+    // won't string-equal a concrete to.path). hasRoute() guards against re-adding,
+    // so a genuinely unknown route falls through to Invalid Page (no loop).
+    const extViews = useExtensions().views
+    let added = false
+    for (const v of extViews) {
+      if (!router.hasRoute(v.name)) {
+        router.addRoute({ name: v.name, path: v.path, component: v.component })
+        added = true
+      }
+    }
+    if (added) {
+      next({ ...to })
+    } else {
+      next({ name: 'Invalid Page' })
+    }
   } else if (['Deal', 'Lead'].includes(to.name) && !to.hash) {
     let storageKey = to.name === 'Deal' ? 'lastDealTab' : 'lastLeadTab'
     const activeTab = localStorage.getItem(storageKey) || 'activity'
@@ -204,10 +224,10 @@ router.beforeEach(async (to, from, next) => {
       }
 
       const doctype = doctypeMap[to.name]
-      // Svasamm default: Kanban for the pipeline-style lists; List elsewhere.
+      // Svasamm default: Kanban only for Tasks; Leads/Deals default to List.
       // A user's saved default / an is_default standard view still overrides
       // this below.
-      const preferredDefault = { Leads: 'kanban', Deals: 'kanban', Tasks: 'kanban' }
+      const preferredDefault = { Tasks: 'kanban' }
       let defaultViewType = preferredDefault[to.name] || 'list'
 
       let globalDefault = getDefaultView()

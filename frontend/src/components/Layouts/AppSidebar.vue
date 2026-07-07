@@ -203,7 +203,7 @@ import router from '@/router'
 import { useStorage } from '@vueuse/core'
 import { useDemoData } from '@/composables/demoData'
 import { ref, reactive, computed, markRaw, onMounted } from 'vue'
-import { useExtensions } from '@/extensions/registry'
+import { useExtensions, applyExtensionSidebar } from '@/extensions/registry'
 
 const { getPinnedViews, getPublicViews } = viewsStore()
 const { toggle: toggleNotificationPanel } = notificationsStore()
@@ -260,12 +260,14 @@ const links = [
 ]
 
 const allViews = computed(() => {
+  const extensions = useExtensions()
+  const mergedLinks = applyExtensionSidebar(links, extensions.sidebarItems)
   let _views = [
     {
       name: 'All Views',
       hideLabel: true,
       opened: true,
-      views: links.filter((link) => {
+      views: mergedLinks.filter((link) => {
         if (link.condition) {
           return link.condition()
         }

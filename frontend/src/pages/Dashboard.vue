@@ -115,6 +115,26 @@
           </Tooltip>
         </template>
       </Link>
+      <Link
+        v-if="isAdmin() || isManager()"
+        class="form-control w-48"
+        variant="outline"
+        :value="filters.distributor"
+        doctype="Distributor"
+        :placeholder="__('All Distributors')"
+        :hideMe="true"
+        @change="(v) => updateFilter('distributor', v)"
+      />
+      <Link
+        v-if="isAdmin() || isManager()"
+        class="form-control w-48"
+        variant="outline"
+        :value="filters.territory"
+        doctype="CRM Territory"
+        :placeholder="__('All Territories')"
+        :hideMe="true"
+        @change="(v) => updateFilter('territory', v)"
+      />
     </div>
 
     <div class="w-full overflow-y-scroll">
@@ -167,6 +187,8 @@ const showAddChartModal = ref(false)
 const filters = reactive({
   period: getLastXDays(),
   user: null,
+  distributor: null,
+  territory: null,
 })
 
 const fromDate = computed(() => {
@@ -242,6 +264,8 @@ const dashboardItems = createResource({
       from_date: fromDate.value,
       to_date: toDate.value,
       user: filters.user,
+      distributor: filters.distributor,
+      territory: filters.territory,
     }
   },
   auto: true,
