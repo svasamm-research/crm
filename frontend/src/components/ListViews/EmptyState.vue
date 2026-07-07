@@ -5,14 +5,25 @@
       :class="widthClass"
       :style="{ top: top }"
     >
-      <!-- size-7.5 removed: our 400x300 illustrations need proportional rendering,
-           not icon-sized (30px). h-40 gives a reasonable ~160px height;
-           w-auto preserves aspect ratio; max-w-full respects parent widthClass. -->
+      <!-- When a recognized illustration exists, render it as an image.
+           Otherwise render the passed icon (a VNode or component) inside a
+           subtle circle so Visits, Calls, etc. show a relevant icon instead
+           of the generic sales-funnel fallback. -->
+      <!-- Grayscale so every empty state reads calm/neutral (UAT 2026-07-07):
+           the coloured (blue) illustrations felt loud vs the neutral icon path. -->
       <img
+        v-if="illustration"
         :src="illustration"
         :alt="`No ${props.name || 'records'} yet`"
         class="empty-state-illustration h-40 w-auto max-w-full"
+        style="filter: grayscale(1); opacity: 0.85"
       />
+      <div
+        v-else
+        class="flex h-24 w-24 items-center justify-center rounded-full bg-surface-gray-2"
+      >
+        <component :is="props.icon" class="h-10 w-10 text-ink-gray-4" />
+      </div>
       <div class="flex flex-col items-center gap-1">
         <span class="text-lg font-medium text-ink-gray-8">
           {{ computedTitle }}
@@ -70,7 +81,8 @@ const illustrationByName = {
   Notes: noNotes,
   'Call Logs': noCallLogs,
 }
-const illustration = computed(() => illustrationByName[props.name] || noLeads)
+// Returns null for unrecognised names so the template falls back to the icon path.
+const illustration = computed(() => illustrationByName[props.name] ?? null)
 
 const widthClass = computed(() => {
   switch (props.width) {
