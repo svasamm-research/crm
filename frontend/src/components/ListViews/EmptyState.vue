@@ -9,11 +9,14 @@
            Otherwise render the passed icon (a VNode or component) inside a
            subtle circle so Visits, Calls, etc. show a relevant icon instead
            of the generic sales-funnel fallback. -->
+      <!-- Grayscale so every empty state reads calm/neutral (UAT 2026-07-07):
+           the coloured (blue) illustrations felt loud vs the neutral icon path. -->
       <img
         v-if="illustration"
         :src="illustration"
         :alt="`No ${props.name || 'records'} yet`"
         class="empty-state-illustration h-40 w-auto max-w-full"
+        style="filter: grayscale(1); opacity: 0.85"
       />
       <div
         v-else
