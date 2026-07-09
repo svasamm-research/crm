@@ -11,12 +11,8 @@
           :iconLeft="LucideRefreshCcw"
           @click="dashboardItems.reload"
         />
-        <Button
-          v-if="!editing && isAdmin()"
-          :label="__('Edit')"
-          :iconLeft="LucidePenLine"
-          @click="enableEditing"
-        />
+        <!-- Edit button removed (UAT 2026-07-09): the dashboard layout is fixed for the tenant;
+             editing mode + its Chart/Reset/Cancel/Save controls are no longer reachable. -->
         <Button
           v-if="editing"
           :label="__('Chart')"
