@@ -11,12 +11,8 @@
           :iconLeft="LucideRefreshCcw"
           @click="dashboardItems.reload"
         />
-        <Button
-          v-if="!editing && isAdmin()"
-          :label="__('Edit')"
-          :iconLeft="LucidePenLine"
-          @click="enableEditing"
-        />
+        <!-- Edit button removed (UAT 2026-07-09): the dashboard layout is fixed for the tenant;
+             editing mode + its Chart/Reset/Cancel/Save controls are no longer reachable. -->
         <Button
           v-if="editing"
           :label="__('Chart')"
@@ -123,7 +119,7 @@
         doctype="Distributor"
         :placeholder="__('All Distributors')"
         :hideMe="true"
-        @change="(v) => updateFilter('distributor', v)"
+        @change="onDistributorChange"
       />
       <Link
         v-if="isAdmin() || isManager()"
@@ -133,6 +129,7 @@
         doctype="CRM Territory"
         :placeholder="__('All Territories')"
         :hideMe="true"
+        :disabled="territoryLocked"
         @change="(v) => updateFilter('territory', v)"
       />
     </div>
@@ -169,6 +166,7 @@ import { getLastXDays, formatter, formatRange } from '@/utils/dashboard'
 import {
   usePageMeta,
   createResource,
+  call,
   DateRangePicker,
   Dropdown,
   Tooltip,
@@ -204,6 +202,38 @@ const toDate = computed(() => {
 function updateFilter(key: string, value: unknown, callback?: () => void) {
   filters[key] = value
   callback?.()
+  dashboardItems.reload()
+}
+
+// Distributor -> Territory cascade (mirrors the DMS dashboard). Picking a
+// distributor auto-fills + locks the Territory picker; clearing it unlocks +
+// clears. Distributor.territory links to the DMS `Territory` doctype, whose
+// leaf names are mirrored 1:1 into `CRM Territory` (same name) by
+// dms.setup.install.sync_crm_territory_from_territory — so the value we fetch
+// is a valid CRM Territory name and the backend filter (Lead/Deal.territory ==
+// territory) matches. See the report for the full mismatch note.
+const territoryLocked = ref(false)
+
+async function onDistributorChange(value: string | null) {
+  filters.distributor = value
+  if (!value) {
+    // Distributor cleared -> unlock + clear territory, then reload once.
+    territoryLocked.value = false
+    filters.territory = null
+    dashboardItems.reload()
+    return
+  }
+  try {
+    const territory = await call('frappe.client.get_value', {
+      doctype: 'Distributor',
+      filters: { name: value },
+      fieldname: 'territory',
+    })
+    filters.territory = territory?.territory || null
+  } catch (e) {
+    filters.territory = null
+  }
+  territoryLocked.value = true
   dashboardItems.reload()
 }
 
