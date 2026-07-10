@@ -3,8 +3,14 @@
 
 import frappe
 from frappe import _
-from frappe.desk.form.assign_to import _add as assign
 from frappe.model.document import Document
+
+try:
+	# frappe >= 16.25: public add() dropped ignore_permissions; use private _add.
+	from frappe.desk.form.assign_to import _add as assign
+except ImportError:
+	# frappe < 16.25: public add() still accepts ignore_permissions.
+	from frappe.desk.form.assign_to import add as assign
 
 from crm.api.exchange_rate import get_exchange_rate
 from crm.fcrm.doctype.crm_service_level_agreement.utils import get_sla
