@@ -129,8 +129,7 @@
         doctype="CRM Territory"
         :placeholder="__('All Territories')"
         :hideMe="true"
-        :disabled="territoryLocked"
-        @change="(v) => updateFilter('territory', v)"
+        @change="onTerritoryChange"
       />
     </div>
 
@@ -205,35 +204,49 @@ function updateFilter(key: string, value: unknown, callback?: () => void) {
   dashboardItems.reload()
 }
 
-// Distributor -> Territory cascade (mirrors the DMS dashboard). Picking a
-// distributor auto-fills + locks the Territory picker; clearing it unlocks +
-// clears. Distributor.territory links to the DMS `Territory` doctype, whose
-// leaf names are mirrored 1:1 into `CRM Territory` (same name) by
-// dms.setup.install.sync_crm_territory_from_territory — so the value we fetch
-// is a valid CRM Territory name and the backend filter (Lead/Deal.territory ==
-// territory) matches. See the report for the full mismatch note.
-const territoryLocked = ref(false)
-
+// Distributor <-> Territory cascade — bidirectional + EDITABLE (UAT 2026-07-10,
+// mirrors the DMS bidirectional behaviour): picking a Distributor auto-fills the
+// Territory (which stays editable); picking a Territory auto-fills the
+// Distributor; clearing either clears the other. Distributor.territory is
+// name-synced 1:1 with CRM Territory (sync_crm_territory_from_territory), so the
+// fetched value is a valid CRM Territory name and the backend filter matches.
 async function onDistributorChange(value: string | null) {
   filters.distributor = value
   if (!value) {
-    // Distributor cleared -> unlock + clear territory, then reload once.
-    territoryLocked.value = false
     filters.territory = null
     dashboardItems.reload()
     return
   }
   try {
-    const territory = await call('frappe.client.get_value', {
+    const r = await call('frappe.client.get_value', {
       doctype: 'Distributor',
       filters: { name: value },
       fieldname: 'territory',
     })
-    filters.territory = territory?.territory || null
+    filters.territory = r?.territory || null
   } catch (e) {
     filters.territory = null
   }
-  territoryLocked.value = true
+  dashboardItems.reload()
+}
+
+async function onTerritoryChange(value: string | null) {
+  filters.territory = value
+  if (!value) {
+    filters.distributor = null
+    dashboardItems.reload()
+    return
+  }
+  try {
+    const r = await call('frappe.client.get_value', {
+      doctype: 'Distributor',
+      filters: { territory: value },
+      fieldname: 'name',
+    })
+    filters.distributor = r?.name || null
+  } catch (e) {
+    filters.distributor = null
+  }
   dashboardItems.reload()
 }
 

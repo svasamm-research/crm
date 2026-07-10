@@ -338,6 +338,7 @@ import { computed, ref, onMounted, watch, h, markRaw } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useDebounceFn } from '@vueuse/core'
 import { isMobileView } from '@/composables/settings'
+import { runFilterHooks } from '@/extensions/registry'
 import Draggable from 'vuedraggable'
 import _ from 'lodash'
 import ImportIcon from '~icons/lucide/import'
@@ -834,7 +835,7 @@ function setupNewQuickFilters(filters) {
   }))
 }
 
-function applyQuickFilter(filter, value) {
+async function applyQuickFilter(filter, value) {
   let filters = { ...list.value.params.filters }
   let field = filter.fieldname
   if (value) {
@@ -850,6 +851,19 @@ function applyQuickFilter(filter, value) {
     delete filters[field]
     filter['value'] = ''
   }
+  // Extension hooks (e.g. the Distributor<->Territory cascade) may add/remove
+  // paired filters before the list reloads. quickFilterList re-derives each
+  // chip's value from params.filters, so the paired chip updates automatically.
+  await runFilterHooks({
+    doctype: props.doctype,
+    fieldname: field,
+    value,
+    filters,
+    setFilter: (fn, val) => {
+      if (val === undefined || val === null || val === '') delete filters[fn]
+      else filters[fn] = val
+    },
+  })
   updateFilter(filters)
 }
 
