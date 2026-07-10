@@ -6,11 +6,19 @@ const state = reactive({
   sidebarItems: [],
   views: [],
   featureFlags: {},
+  // Async hooks invoked when a list quick-filter changes, BEFORE the list
+  // reloads. Each receives { doctype, fieldname, value, filters, setFilter }
+  // and may add/remove paired filters (e.g. Distributor<->Territory cascade).
+  filterHooks: [],
 })
 
 export const registry = {
   registerLeadTab(tab) {
     state.leadTabs.push(tab)
+  },
+  // fn: async ({ doctype, fieldname, value, filters, setFilter }) => void
+  registerFilterHook(fn) {
+    state.filterHooks.push(fn)
   },
   registerDealTab(tab) {
     state.dealTabs.push(tab)
@@ -33,6 +41,18 @@ export const registry = {
 
 export function useExtensions() {
   return state
+}
+
+// Run all registered filter hooks in sequence (awaits each). Called by
+// ViewControls before a list reload so hooks can adjust the filters object.
+export async function runFilterHooks(ctx) {
+  for (const fn of state.filterHooks) {
+    try {
+      await fn(ctx)
+    } catch (e) {
+      console.error('filter hook failed', e)
+    }
+  }
 }
 
 // Merge built-in tabs with extension tabs, honouring an optional
