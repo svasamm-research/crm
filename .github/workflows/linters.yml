@@ -65,6 +65,9 @@ jobs:
 
         steps:
             - uses: actions/checkout@v6
+              with:
+                  # Full history so pre-commit can diff against the PR base.
+                  fetch-depth: 0
 
             - name: Set up Python
               uses: actions/setup-python@v6
@@ -79,15 +82,23 @@ jobs:
             - name: Install frontend dependencies
               run: cd frontend && yarn install
 
-            - name: Run Pre-commit
-              uses: pre-commit/action@v3.0.1
+            - name: Run Pre-commit (PR-changed files only)
+              # Scope to files changed in the PR, not --all-files: this is a
+              # frappe/crm fork carrying upstream's formatting, which does not
+              # match our pre-commit config. Linting the whole tree flags base
+              # frappe/crm files we don't own; reformatting them would conflict
+              # with upstream merges. We only gate the files this PR touches.
               env:
                   # ESLint hook pinned at v8.44.0 still references legacy
-                  # .eslintrc config format; this repo has migrated to flat
-                  # config (frontend/eslint.config.mjs). Deferred to a
-                  # separate config-modernization task. Skip here so the
-                  # rest of the pre-commit chain (Ruff, Prettier, commitlint
-                  # fixture checks) still runs.
+                  # .eslintrc; repo has migrated to flat config. Deferred.
                   SKIP: eslint
-              with:
-                  extra_args: --all-files
+                  # base commit passed via env (never interpolate untrusted
+                  # input directly into run:).
+                  BASE_SHA: ${{ github.event.pull_request.base.sha }}
+              run: |
+                  pip install pre-commit
+                  if [ -n "$BASE_SHA" ]; then
+                      pre-commit run --from-ref "$BASE_SHA" --to-ref HEAD --show-diff-on-failure
+                  else
+                      pre-commit run --all-files --show-diff-on-failure
+                  fi
