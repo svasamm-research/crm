@@ -169,6 +169,7 @@
       :value="data[field.fieldname]"
       :formatter="(date) => getFormat(date, '', true)"
       :placeholder="getPlaceholder(field)"
+      :maxDate="PAST_ONLY_DATE_FIELDS.has(field.fieldname) ? todayStr : undefined"
       input-class="border-none"
       @change="(v) => fieldChange(v, field)"
     />
@@ -322,6 +323,15 @@ const { getFormattedPercent, getFormattedFloat, getFormattedCurrency } =
   getMeta(doctype)
 
 const { users, getUser, canCreateMasters } = usersStore()
+
+// Svasamm fork patch (UAT 2026-07-11): Date fields that record something that
+// already happened (a lead's origination date) can't be in the future — the
+// calendar greys out future cells (frappe-ui DatePicker `maxDate`, added via
+// the crm patch-package patch). Future-dated fields (Expected Closing Month
+// etc.) are unaffected. Server-side validate remains the authority.
+const PAST_ONLY_DATE_FIELDS = new Set(['custom_lead_date'])
+const _today = new Date()
+const todayStr = `${_today.getFullYear()}-${String(_today.getMonth() + 1).padStart(2, '0')}-${String(_today.getDate()).padStart(2, '0')}`
 
 // Sprint 10 (Svasamm fork patch) — doctypes whose pickers should NOT
 // auto-show "+ Create new" for non-admin users. Non-admin users must
