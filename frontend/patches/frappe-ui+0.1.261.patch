@@ -1,0 +1,61 @@
+diff --git a/node_modules/frappe-ui/src/components/DatePicker/DatePicker.vue b/node_modules/frappe-ui/src/components/DatePicker/DatePicker.vue
+index a087d12..59f79eb 100644
+--- a/node_modules/frappe-ui/src/components/DatePicker/DatePicker.vue
++++ b/node_modules/frappe-ui/src/components/DatePicker/DatePicker.vue
+@@ -106,16 +106,21 @@
+                 v-for="dateObj in week"
+                 type="button"
+                 :key="dateObj.key"
+-                class="flex h-8 w-8 items-center justify-center rounded cursor-pointer text-sm focus:outline-none focus:ring-2 focus:ring-outline-gray-2"
++                :disabled="isDateDisabled(dateObj.date)"
++                class="flex h-8 w-8 items-center justify-center rounded text-sm focus:outline-none focus:ring-2 focus:ring-outline-gray-2"
+                 :class="[
++                  isDateDisabled(dateObj.date)
++                    ? 'cursor-not-allowed text-ink-gray-3 opacity-40'
++                    : 'cursor-pointer',
+                   dateObj.inMonth ? 'text-ink-gray-8' : 'text-ink-gray-3',
+                   dateObj.isToday ? 'font-extrabold text-ink-gray-9' : '',
+                   dateObj.isSelected
+                     ? 'bg-surface-gray-6 text-ink-white hover:bg-surface-gray-6'
+-                    : 'hover:bg-surface-gray-2',
++                    : !isDateDisabled(dateObj.date) && 'hover:bg-surface-gray-2',
+                 ]"
+                 role="gridcell"
+                 :aria-selected="dateObj.isSelected ? 'true' : 'false'"
++                :aria-disabled="isDateDisabled(dateObj.date) ? 'true' : 'false'"
+                 :aria-label="
+                   dateObj.date.format('YYYY-MM-DD') +
+                   (dateObj.isToday ? ' (Today)' : '')
+@@ -416,10 +421,18 @@ function next(): void {
+     currentYear.value += 12
+   }
+ }
++// Svasamm patch (UAT 2026-07-11): a cell is disabled when it falls after
++// props.maxDate (past-only fields e.g. CRM Lead custom_lead_date).
++function isDateDisabled(date: string | Date | Dayjs) {
++  if (!props.maxDate) return false
++  return dayjs(date).isAfter(dayjs(props.maxDate), 'day')
++}
++
+ function handleDateCellClick(
+   date: string | Date | Dayjs,
+   togglePopover: () => void,
+ ) {
++  if (isDateDisabled(date)) return
+   selectDate(date)
+   if (autoClose.value) togglePopover()
+   isTyping.value = false
+diff --git a/node_modules/frappe-ui/src/components/DatePicker/types.ts b/node_modules/frappe-ui/src/components/DatePicker/types.ts
+index ce09c4c..2d5b8f3 100644
+--- a/node_modules/frappe-ui/src/components/DatePicker/types.ts
++++ b/node_modules/frappe-ui/src/components/DatePicker/types.ts
+@@ -18,6 +18,9 @@ export interface CommonDatePickerProps {
+ export interface DatePickerProps extends CommonDatePickerProps {
+   value?: string
+   modelValue?: string
++  // Svasamm patch (UAT 2026-07-11): disable/grey calendar cells AFTER this date
++  // (YYYY-MM-DD). Used for past-only fields e.g. CRM Lead custom_lead_date.
++  maxDate?: string
+ }
+ 
+ export interface DateRangePickerProps extends CommonDatePickerProps {
