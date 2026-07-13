@@ -169,7 +169,9 @@
       :value="data[field.fieldname]"
       :formatter="(date) => getFormat(date, '', true)"
       :placeholder="getPlaceholder(field)"
-      :maxDate="PAST_ONLY_DATE_FIELDS.has(field.fieldname) ? todayStr : undefined"
+      :maxDate="
+        PAST_ONLY_DATE_FIELDS.has(field.fieldname) ? todayStr : undefined
+      "
       input-class="border-none"
       @change="(v) => fieldChange(v, field)"
     />
