@@ -140,7 +140,7 @@
                         ? field.options
                         : row[field.options]
                     "
-                    :filters="field.filters"
+                    :filters="resolveRowFilters(field.filters, row)"
                     :onCreate="
                       disableLinkCreate
                         ? undefined
@@ -535,6 +535,25 @@ const fields = computed(() => {
 const allFields = computed(() => {
   return getFields()?.map((f) => getFieldObj(f)) || []
 })
+
+// Resolve row-dependent link filters. A filter value of "row:<fieldname>"
+// (set via a Custom Field's link_filters) is replaced with that row's current
+// value, so a grid Link can scope to a sibling column — e.g. Model filtered by
+// the row's Technology. Keys whose referenced value is empty are dropped (show
+// all until the parent field is picked).
+function resolveRowFilters(filters, row) {
+  if (!filters || typeof filters !== 'object') return filters
+  const out = {}
+  for (const [key, value] of Object.entries(filters)) {
+    if (typeof value === 'string' && value.startsWith('row:')) {
+      const v = row?.[value.slice(4)]
+      if (v) out[key] = v
+    } else {
+      out[key] = value
+    }
+  }
+  return out
+}
 
 function getFieldObj(field) {
   if (field.fieldtype === 'Link' && field.options !== 'User') {
