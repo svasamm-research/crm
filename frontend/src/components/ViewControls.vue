@@ -192,7 +192,7 @@
           @update="(isDefault) => updateColumns(isDefault)"
         />
         <Dropdown
-          v-if="route.params.viewType !== 'kanban' || isManager()"
+          v-if="route.params.viewType !== 'kanban'"
           placement="right"
           :options="[
             {

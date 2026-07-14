@@ -53,7 +53,7 @@
               <div class="text-ink-gray-9">{{ column.column.name }}</div>
             </div>
             <div class="flex">
-              <Dropdown :options="actions(column)">
+              <Dropdown v-if="canManageColumns" :options="actions(column)">
                 <template #default>
                   <Button
                     class="hidden group-hover:flex"
@@ -145,7 +145,7 @@
         </div>
       </template>
     </Draggable>
-    <div class="shrink-0 min-w-64">
+    <div v-if="canManageColumns" class="shrink-0 min-w-64">
       <Autocomplete
         value=""
         :options="deletedColumns"
@@ -178,7 +178,15 @@ import IndicatorIcon from '@/components/Icons/IndicatorIcon.vue'
 import { isTouchScreenDevice, colors, parseColor } from '@/utils'
 import Draggable from 'vuedraggable'
 import { Dropdown, Popover } from 'frappe-ui'
+import { usersStore } from '@/stores/users'
+import { sessionStore } from '@/stores/session'
 import { computed } from 'vue'
+
+// Only OEM-tier users may add/remove Kanban columns (i.e. board stages).
+// Distributor Admin / Sales User must not restructure the pipeline.
+const { isOEM } = usersStore()
+const session = sessionStore()
+const canManageColumns = computed(() => isOEM(session.user))
 
 defineProps({
   options: {
