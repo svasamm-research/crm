@@ -28,7 +28,10 @@
 
       <template #item-label="{ active, selected, option }">
         <slot name="item-label" v-bind="{ active, selected, option }">
-          <div v-if="option.description && showSubtitle" class="flex flex-col gap-1">
+          <div
+            v-if="option.description && showSubtitle"
+            class="flex flex-col gap-1"
+          >
             <div class="flex-1 font-semibold truncate text-ink-gray-7">
               {{ option.label }}
             </div>
