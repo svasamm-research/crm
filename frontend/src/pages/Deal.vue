@@ -34,6 +34,12 @@
           </Button>
         </template>
       </Dropdown>
+      <component
+        :is="action.component"
+        v-for="action in ext.dealHeaderActions"
+        :key="action.key"
+        :deal="doc"
+      />
     </template>
   </LayoutHeader>
   <div v-if="doc.name" class="flex h-full overflow-hidden">
