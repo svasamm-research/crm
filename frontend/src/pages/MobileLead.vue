@@ -53,7 +53,7 @@
       <Button
         :label="__('Convert')"
         variant="solid"
-        @click="showConvertToDealModal = true"
+        @click="openConvertToDeal"
       />
     </div>
   </div>
@@ -152,6 +152,7 @@ import { getMeta } from '@/stores/meta'
 import { useDocument } from '@/data/document'
 import { whatsappEnabled, isMobileView } from '@/composables/settings'
 import { useActiveTabManager } from '@/composables/useActiveTabManager'
+import { useExtensions } from '@/extensions/registry'
 import {
   createResource,
   Dropdown,
@@ -191,6 +192,23 @@ const {
 } = useDocument('CRM Lead', props.leadId)
 
 const doc = computed(() => document.doc || {})
+
+const ext = useExtensions()
+
+// Surface the "lead needs >=1 product" rule (a tenant feature flag, enforced
+// server-side on convert) before the user fills the whole modal.
+function openConvertToDeal() {
+  if (
+    ext.featureFlags.requireProductsBeforeConvert &&
+    !doc.value.products?.length
+  ) {
+    toast.error(
+      __('Add at least one product before converting this lead to a deal.'),
+    )
+    return
+  }
+  showConvertToDealModal.value = true
+}
 
 onMounted(async () => {
   if (document.doc) await triggerOnRender()
