@@ -28,7 +28,7 @@
 
       <template #item-label="{ active, selected, option }">
         <slot name="item-label" v-bind="{ active, selected, option }">
-          <div v-if="option.description" class="flex flex-col gap-1">
+          <div v-if="option.description && showSubtitle" class="flex flex-col gap-1">
             <div class="flex-1 font-semibold truncate text-ink-gray-7">
               {{ option.label }}
             </div>
@@ -81,6 +81,12 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['update:modelValue', 'change'])
+
+// Link pickers render a single (title-only) line by default. A few doctypes are
+// named by an opaque series (CRM-LEAD-#####, CRM-DEAL-#####) whose title is not
+// unique, so they keep the record id as a subtitle to tell duplicates apart.
+const SUBTITLE_DOCTYPES = new Set(['CRM Lead', 'CRM Deal'])
+const showSubtitle = computed(() => SUBTITLE_DOCTYPES.has(props.doctype))
 
 const attrs = useAttrs()
 
