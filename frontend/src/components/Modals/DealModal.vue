@@ -76,6 +76,7 @@ import { statusesStore } from '@/stores/statuses'
 import { isMobileView } from '@/composables/settings'
 import { showQuickEntryModal, quickEntryProps } from '@/composables/modals'
 import { useDocument } from '@/data/document'
+import { applyFieldDefaults } from '@/utils'
 import { useTelemetry } from 'frappe-ui/frappe'
 import { Switch, createResource } from 'frappe-ui'
 import { computed, ref, onMounted, nextTick, watch } from 'vue'
@@ -128,7 +129,7 @@ const tabs = createResource({
   auto: true,
   transform: (_tabs) => {
     hasOrganizationSections.value = false
-    return _tabs.forEach((tab) => {
+    _tabs.forEach((tab) => {
       tab.sections.forEach((section) => {
         section.columns.forEach((column) => {
           if (
@@ -158,6 +159,8 @@ const tabs = createResource({
         })
       })
     })
+    applyFieldDefaults(_tabs, deal.doc)
+    return _tabs
   },
 })
 

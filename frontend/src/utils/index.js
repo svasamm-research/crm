@@ -944,3 +944,23 @@ export function sanitizeHTML(html = '', options = {}) {
   if (typeof html !== 'string') return ''
   return DOMPurify.sanitize(html, options)
 }
+
+// Apply each layout field's `default` onto a NEW document, in place.
+//
+// Frappe applies field defaults server-side for Desk forms; the SPA's create
+// modals never did, so a `default` supplied by the Quick Entry layout was
+// invisible. Only blanks are filled — anything the caller pre-seeded (list
+// filters, `defaults` prop) wins.
+export function applyFieldDefaults(tabs, doc) {
+  tabs?.forEach((tab) =>
+    tab.sections?.forEach((section) =>
+      section.columns?.forEach((column) =>
+        column.fields?.forEach((field) => {
+          if (field?.default && isNull(doc[field.fieldname])) {
+            doc[field.fieldname] = field.default
+          }
+        }),
+      ),
+    ),
+  )
+}

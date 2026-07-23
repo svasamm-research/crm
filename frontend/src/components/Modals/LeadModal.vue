@@ -51,6 +51,7 @@ import { showQuickEntryModal, quickEntryProps } from '@/composables/modals'
 import { useOnboarding, useTelemetry } from 'frappe-ui/frappe'
 import { createResource } from 'frappe-ui'
 import { useDocument } from '@/data/document'
+import { applyFieldDefaults } from '@/utils'
 import { computed, onMounted, ref, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 
@@ -80,7 +81,7 @@ const tabs = createResource({
   params: { doctype: 'CRM Lead', type: 'Quick Entry' },
   auto: true,
   transform: (_tabs) => {
-    return _tabs.forEach((tab) => {
+    _tabs.forEach((tab) => {
       tab.sections.forEach((section) => {
         section.columns.forEach((column) => {
           column.fields.forEach((field) => {
@@ -97,6 +98,8 @@ const tabs = createResource({
         })
       })
     })
+    applyFieldDefaults(_tabs, lead.doc)
+    return _tabs
   },
 })
 
