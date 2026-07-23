@@ -96,7 +96,7 @@ import { showQuickEntryModal, quickEntryProps } from '@/composables/modals'
 import { isMobileView } from '@/composables/settings'
 import { useOnboarding, useTelemetry } from 'frappe-ui/frappe'
 import { Switch, Dialog, createResource, call } from 'frappe-ui'
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
 const props = defineProps({
@@ -214,6 +214,47 @@ const dealTabs = createResource({
     return hasFields ? parsedTabs : []
   },
 })
+
+// Fields carried from the source Lead onto the new Deal so the user isn't
+// re-typing details the lead already has. `organization` stays a plain string
+// even though CRM Deal.organization is a Link — the convert path dedups/creates
+// the CRM Organization by name server-side.
+const PREFILL_FROM_LEAD = [
+  'organization',
+  'industry',
+  'first_name',
+  'last_name',
+  'salutation',
+  'email',
+  'mobile_no',
+  'no_of_employees',
+  'annual_revenue',
+  'website',
+  'territory',
+]
+
+// The new-CRM-Deal doc is cached module-level (documentsCache['CRM Deal']['']),
+// so it survives across opens. Reset it and re-seed from the CURRENT lead on
+// every open, otherwise a prior lead's values (and user-typed fields like
+// status / expected_closing_month) leak into the next conversion.
+function resetAndSeedDeal() {
+  deal.doc = { __newDocument: true, doctype: 'CRM Deal' }
+  // Table fields in the layout need an array so FieldLayout can render them.
+  dealTabs.data?.forEach((tab) =>
+    tab.sections?.forEach((section) =>
+      section.columns?.forEach((column) =>
+        column.fields?.forEach((field) => {
+          if (field.fieldtype === 'Table') deal.doc[field.fieldname] = []
+        }),
+      ),
+    ),
+  )
+  for (const field of PREFILL_FROM_LEAD) {
+    deal.doc[field] = props.lead[field] || ''
+  }
+}
+
+watch(show, (isOpen) => isOpen && resetAndSeedDeal(), { immediate: true })
 
 function openQuickEntryModal() {
   showQuickEntryModal.value = true
