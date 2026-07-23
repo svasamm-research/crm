@@ -50,6 +50,12 @@
         v-if="document.actions?.length"
         :actions="document.actions"
       />
+      <component
+        :is="action.component"
+        v-for="action in ext.dealHeaderActions"
+        :key="action.key"
+        :deal="doc"
+      />
     </div>
   </div>
   <div v-if="doc.name" class="flex h-full overflow-hidden">
@@ -293,6 +299,7 @@ import SidePanelLayout from '@/components/SidePanelLayout.vue'
 import SLASection from '@/components/SLASection.vue'
 import CustomActions from '@/components/CustomActions.vue'
 import { setupCustomizations, isTranslatable } from '@/utils'
+import { useExtensions } from '@/extensions/registry'
 import { getView } from '@/utils/view'
 import { getSettings } from '@/stores/settings'
 import { globalStore } from '@/stores/global'
@@ -324,6 +331,7 @@ const { statusOptions, getDealStatus } = statusesStore()
 const { doctypeMeta } = getMeta('CRM Deal')
 const route = useRoute()
 const router = useRouter()
+const ext = useExtensions()
 
 const props = defineProps({
   dealId: { type: String, required: true },

@@ -3,6 +3,7 @@ import { reactive } from 'vue'
 const state = reactive({
   leadTabs: [],
   dealTabs: [],
+  dealHeaderActions: [],
   sidebarItems: [],
   views: [],
   featureFlags: {},
@@ -22,6 +23,11 @@ export const registry = {
   },
   registerDealTab(tab) {
     state.dealTabs.push(tab)
+  },
+  // action shape: { key, component } where component receives the deal
+  // document as a `deal` prop and owns all of its own display/permission logic.
+  registerDealHeaderAction(action) {
+    state.dealHeaderActions.push(action)
   },
   // item shape: { label, icon, to, insertAfter?, condition? }
   registerSidebarItem(item) {

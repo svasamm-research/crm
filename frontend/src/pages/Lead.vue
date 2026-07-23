@@ -37,7 +37,7 @@
       <Button
         :label="__('Convert to Deal')"
         variant="solid"
-        @click="showConvertToDealModal = true"
+        @click="openConvertToDeal"
       />
     </template>
   </LayoutHeader>
@@ -406,6 +406,21 @@ usePageMeta(() => {
 })
 
 const ext = useExtensions()
+
+// Surface the "lead needs >=1 product" rule (a tenant feature flag, enforced
+// server-side on convert) before the user fills the whole modal.
+function openConvertToDeal() {
+  if (
+    ext.featureFlags.requireProductsBeforeConvert &&
+    !doc.value.products?.length
+  ) {
+    toast.error(
+      __('Add at least one product before converting this lead to a deal.'),
+    )
+    return
+  }
+  showConvertToDealModal.value = true
+}
 
 const tabs = computed(() => {
   let tabOptions = [
