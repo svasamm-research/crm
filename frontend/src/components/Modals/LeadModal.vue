@@ -1,5 +1,7 @@
 <template>
-  <Dialog v-model="show" :options="{ size: '3xl' }">
+  <!-- disableOutsideClickToClose: a stray click on the backdrop used to discard
+       everything typed into this form. Dismissal is the ✕ (or Escape). -->
+  <Dialog v-model="show" :options="{ size: '3xl' }" disableOutsideClickToClose>
     <template #body>
       <div class="bg-surface-modal px-4 pb-6 pt-5 sm:px-6">
         <div class="mb-5 flex items-center justify-between">
